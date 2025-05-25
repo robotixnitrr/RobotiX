@@ -90,7 +90,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 w-full">
+            {/* <div className="grid grid-cols-2 gap-2 w-full">
               <Button
                 type="button"
                 variant="outline"
@@ -109,7 +109,7 @@ export default function LoginPage() {
               >
                 Demo Assignee
               </Button>
-            </div>
+            </div> */}
 
             <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
