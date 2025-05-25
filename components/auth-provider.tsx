@@ -4,7 +4,7 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
-import type { User } from "@/lib/models"
+import type { User } from "@/db/schema"
 
 type AuthContextType = {
   user: User | null

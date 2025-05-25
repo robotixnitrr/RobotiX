@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useAuth } from "@/components/auth-provider"
 import DashboardLayout from "@/components/dashboard-layout"
@@ -14,15 +13,20 @@ import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
+import { format } from "date-fns"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function SettingsPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    position: user?.position || "",
   })
+
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     taskAssigned: true,
@@ -47,9 +51,7 @@ export default function SettingsPage() {
 
     try {
       setLoading(true)
-
-      // In a real app, this would be an API call to update the profile
-      // For demo purposes, we'll simulate a successful update
+      // Simulate update
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       toast({
@@ -72,9 +74,6 @@ export default function SettingsPage() {
 
     try {
       setLoading(true)
-
-      // In a real app, this would be an API call to update notification settings
-      // For demo purposes, we'll simulate a successful update
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       toast({
@@ -119,17 +118,39 @@ export default function SettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={profileForm.email}
-                      onChange={handleProfileChange}
-                    />
+                    <Input id="email" name="email" type="email" value={profileForm.email} disabled />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="position">Position</Label>
+                    {/* <Input id="position" name="position" value={profileForm.position} onChange={handleProfileChange} /> */}
+                    <Select value={profileForm.position} onValueChange={(e) => setProfileForm((prev) => ({ ...prev, position: e as 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members' }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your position" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="overall-cordinator">Overall coordinator</SelectItem>
+                        <SelectItem value="head-coordinator">Head coordinator</SelectItem>
+                        <SelectItem value="core-coordinator">Core coordinator</SelectItem>
+                        <SelectItem value="executive">Executive</SelectItem>
+                        <SelectItem value="members">Members</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Role</Label>
-                    <Input id="role" value={user.role.charAt(0).toUpperCase() + user.role.slice(1)} disabled />
+                    <Input
+                      id="role"
+                      value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      disabled
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastNotificationReadAt">Last Notification Read</Label>
+                    <Input
+                      id="lastNotificationReadAt"
+                      value={format(user?.lastNotificationReadAt?.toLocaleString() || 0, "PPPpp")}
+                      disabled
+                    />
                   </div>
                 </CardContent>
                 <CardFooter>
@@ -147,6 +168,7 @@ export default function SettingsPage() {
               </form>
             </Card>
 
+            {/* Notifications card remains unchanged */}
             <Card>
               <form onSubmit={handleNotificationSubmit}>
                 <CardHeader>
@@ -210,28 +232,28 @@ export default function SettingsPage() {
             </Card>
           </div>
 
+          {/* Right column remains unchanged */}
           <div className="space-y-6">
             <DatabaseStatus />
-
             <Card>
               <CardHeader>
                 <CardTitle>Application Info</CardTitle>
                 <CardDescription>Information about this application.</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Version:</span>
                   <span>1.0.0</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Framework:</span>
                   <span>Next.js 15</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Database:</span>
                   <span>PostgreSQL</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">UI Library:</span>
                   <span>shadcn/ui</span>
                 </div>
@@ -240,6 +262,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   )
 }
