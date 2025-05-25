@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { CheckCircle, Loader2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function RegisterPage() {
   const [name, setName] = useState("")
@@ -18,6 +19,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [role, setRole] = useState<"assigner" | "assignee">("assignee")
+  const [position, setPosition] = useState<'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'>("members")
   const { register, isLoading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +29,7 @@ export default function RegisterPage() {
       return // Handle password mismatch
     }
 
-    await register(name, email, password, role)
+    await register(name, email, password, role, position)
   }
 
   return (
@@ -82,6 +84,21 @@ export default function RegisterPage() {
               {password !== confirmPassword && confirmPassword && (
                 <p className="text-sm text-destructive">Passwords do not match</p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="position">Position</Label>
+              <Select value={position} onValueChange={(e) => setPosition(e as 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members')}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your position" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="overall-cordinator">Overall coordinator</SelectItem>
+                  <SelectItem value="head-coordinator">Head coordinator</SelectItem>
+                  <SelectItem value="core-coordinator">Core coordinator</SelectItem>
+                  <SelectItem value="executive">Executive</SelectItem>
+                  <SelectItem value="members">Members</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label>Account Type</Label>

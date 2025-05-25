@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { getTasks, getTaskStats } from "@/lib/actions"
-import type { Task } from "@/lib/models"
+import type { Task } from "@/db/schema"
 import { ArrowRight, CheckCircle2, Clock, ClipboardList, Loader2, PlusCircle } from "lucide-react"
 import DashboardLayout from "@/components/dashboard-layout"
 
@@ -66,8 +66,8 @@ export default function DashboardPage() {
 
   // Filter tasks for the current user
   const userTasks = isAssigner
-    ? tasks.filter((task) => task.assigner_id === Number(user.id))
-    : tasks.filter((task) => task.assignee_id === Number(user.id))
+    ? tasks.filter((task) => task.assignerId === Number(user.id))
+    : tasks.filter((task) => task.assigneeId === Number(user.id))
 
   const pendingTasks = tasks.filter((task) => task.status === "pending")
   const inProgressTasks = tasks.filter((task) => task.status === "in-progress")

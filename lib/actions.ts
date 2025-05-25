@@ -1,20 +1,25 @@
 "use server"
 
-import { sql } from "./db"
 import { revalidatePath } from "next/cache"
+import { sql } from "drizzle-orm"
 import { TaskRepository, UserRepository } from "@/lib/repositories"
-import type { Task, User, CreateTaskInput, UpdateTaskInput } from "./models"
+import type { Task, User, CreateTaskInput, UpdateTaskInput } from "@/db/schema"
+
+// Helper: safely parse a date
+function safeParseDate(value: Date | string | null): Date {
+  return value ? new Date(value) : new Date(0)
+}
 
 // Task actions
 export async function getTasks(filters?: {
   assigneeId?: number
   assignerId?: number
-  status?: string
-  priority?: string
+  status?: "pending" | "in-progress" | "completed"
+  priority?: "low" | "medium" | "high"
   search?: string
-}): Promise<Task[]> {
+}) {
   try {
-    let tasks: Task[]
+    let tasks;
 
     if (filters?.assigneeId) {
       tasks = await TaskRepository.findByAssignee(filters.assigneeId)
@@ -39,41 +44,38 @@ export async function getTasks(filters?: {
 
 export async function getTask(id: number): Promise<Task | null> {
   try {
-    return await TaskRepository.findById(id)
+    const task = await TaskRepository.findById(id);
+    return task ?? null;
   } catch (error) {
-    console.error("Error in getTask:", error)
-    throw new Error(`Failed to get task: ${error instanceof Error ? error.message : "Unknown error"}`)
+    console.error("getTask error:", error);
+    throw new Error(
+      error instanceof Error
+        ? `Failed to fetch task: ${error.message}`
+        : "Failed to fetch task"
+    );
   }
 }
 
 export async function createTask(taskData: Omit<CreateTaskInput, "assigner_name" | "assignee_name">): Promise<Task> {
   try {
-    // Get the assignee name
-    const assignee = await UserRepository.findById(Number(taskData.assignee_id))
-    if (!assignee) {
-      throw new Error("Assignee not found")
-    }
+    const assignee = await UserRepository.findById(Number(taskData.assigneeId))
+    if (!assignee) throw new Error("Assignee not found")
 
-    // Get the assigner name
-    const assigner = await UserRepository.findById(Number(taskData.assigner_id))
-    if (!assigner) {
-      throw new Error("Assigner not found")
-    }
+    const assigner = await UserRepository.findById(Number(taskData.assignerId))
+    if (!assigner) throw new Error("Assigner not found")
 
-    // Create the task with proper data
     const task = await TaskRepository.create({
       title: taskData.title,
       description: taskData.description,
       status: taskData.status || "pending",
       priority: taskData.priority,
-      due_date: taskData.due_date,
-      assigner_id: Number(taskData.assigner_id),
-      assigner_name: assigner.name,
-      assignee_id: Number(taskData.assignee_id),
-      assignee_name: assignee.name,
+      dueDate: taskData.dueDate,
+      assignerId: Number(taskData.assignerId),
+      assignerName: assigner.name,
+      assigneeId: Number(taskData.assigneeId),
+      assigneeName: assignee.name,
     })
 
-    // Revalidate relevant paths
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
 
@@ -86,18 +88,14 @@ export async function createTask(taskData: Omit<CreateTaskInput, "assigner_name"
 
 export async function updateTask(id: number, updates: UpdateTaskInput): Promise<Task | null> {
   try {
-    // If assignee is being updated, get the new assignee name
-    if (updates.assignee_id) {
-      const assignee = await UserRepository.findById(Number(updates.assignee_id))
-      if (!assignee) {
-        throw new Error("Assignee not found")
-      }
-      updates.assignee_name = assignee.name
+    if (updates.assigneeId) {
+      const assignee = await UserRepository.findById(Number(updates.assigneeId))
+      if (!assignee) throw new Error("Assignee not found")
+      updates.assigneeName = assignee.name
     }
 
     const task = await TaskRepository.update(id, updates)
 
-    // Revalidate relevant paths
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
     revalidatePath(`/dashboard/tasks/${id}`)
@@ -109,23 +107,18 @@ export async function updateTask(id: number, updates: UpdateTaskInput): Promise<
   }
 }
 
-export async function updateTaskStatus(id: number, status: "pending" | "in-progress" | "completed") {
+export async function updateTaskStatus(id: number, status: "pending" | "in-progress" | "completed"): Promise<Task | null> {
   try {
-    // Validate status before updating to avoid violating DB constraint
-    const allowed = ["pending", "in-progress", "completed"]
-    if (!allowed.includes(status)) {
-      throw new Error(`Invalid status value: ${status}`)
-    }
     const task = await TaskRepository.findById(id)
-    if (!task) {
-      throw new Error("Task not found")
-    }
-    const updatedTask = await TaskRepository.update(id, { ...task, status })
+    if (!task) throw new Error("Task not found")
+
+    const updatedTask = await TaskRepository.update(id, { status })
 
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
     revalidatePath(`/dashboard/tasks/${id}`)
-    return task
+
+    return updatedTask
   } catch (error) {
     console.error("Error in updateTaskStatus:", error)
     throw new Error(`Failed to update task status: ${error instanceof Error ? error.message : "Unknown error"}`)
@@ -136,11 +129,10 @@ export async function deleteTask(id: number): Promise<boolean> {
   try {
     const success = await TaskRepository.delete(id)
 
-    // Revalidate relevant paths
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
 
-    return success
+    return !!success
   } catch (error) {
     console.error("Error in deleteTask:", error)
     throw new Error(`Failed to delete task: ${error instanceof Error ? error.message : "Unknown error"}`)
@@ -156,7 +148,6 @@ export async function getAssignees(): Promise<User[]> {
   }
 }
 
-// Task statistics
 export async function getTaskStats() {
   try {
     return await TaskRepository.getStats()
@@ -174,7 +165,6 @@ export async function getTaskStats() {
   }
 }
 
-// Get notifications from database
 export async function getNotifications(userId: number): Promise<any[]> {
   try {
     const userResult = await sql`
@@ -182,46 +172,47 @@ export async function getNotifications(userId: number): Promise<any[]> {
       FROM users
       WHERE id = ${userId}
     `
-    const lastRead = userResult[0]?.last_notification_read_at ?? new Date(0)
+    const lastReadRaw = (userResult as any)[0]?.last_notification_read_at ?? null
+    const lastRead = safeParseDate(lastReadRaw)
 
     const tasks = await TaskRepository.findAll()
-    const parseUTC = (timestamp: string) => new Date(timestamp + "Z")
 
     const notifications = tasks
       .map((task) => {
-        const isAssignee = task.assignee_id === userId
-        const isAssigner = task.assigner_id === userId
+        const isAssignee = task.assigneeId === userId
+        const isAssigner = task.assignerId === userId
 
         if (isAssignee) {
           return {
             id: `task-${task.id}-assigned`,
             title: "New task assigned to you",
-            message: `"${task.title}" has been assigned to you by ${task.assigner_name}`,
-            timestamp: task.created_at,
-            type: "task_assigned",
+            message: `"${task.title}" has been assigned to you by ${task.assignerName}`,
+            timestamp: task.createdAt,
+            type: "taskAssigned",
           }
         } else if (isAssigner && task.status === "completed") {
           return {
             id: `task-${task.id}-completed`,
             title: "Task completed",
-            message: `"${task.title}" has been completed by ${task.assignee_name}`,
-            timestamp: task.updated_at,
+            message: `"${task.title}" has been completed by ${task.assigneeName}`,
+            timestamp: task.updatedAt,
             type: "task_completed",
           }
         } else if (isAssigner && task.status === "in-progress") {
           return {
             id: `task-${task.id}-progress`,
             title: "Task in progress",
-            message: `"${task.title}" is now in progress by ${task.assignee_name}`,
-            timestamp: task.updated_at,
+            message: `"${task.title}" is now in progress by ${task.assigneeName}`,
+            timestamp: task.updatedAt,
             type: "task_updated",
           }
         }
+
         return null
       })
       .filter((n): n is NonNullable<typeof n> => n !== null)
-      .filter((n) => parseUTC(n.timestamp) > parseUTC(lastRead))
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .filter((n) => safeParseDate(n.timestamp) > lastRead)
+      .sort((a, b) => safeParseDate(b.timestamp).getTime() - safeParseDate(a.timestamp).getTime())
 
     return notifications
   } catch (error) {

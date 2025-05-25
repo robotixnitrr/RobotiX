@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { deleteTask, getTask, updateTask, updateTaskStatus } from "@/lib/actions"
-import type { Task } from "@/lib/models"
+import type { Task } from "@/db/schema"
 import { ArrowLeft, Calendar, Edit, Loader2, Trash, User } from "lucide-react"
 
 export default function TaskDetailPage() {
@@ -96,7 +96,7 @@ export default function TaskDetailPage() {
   }
 
   const handleDeleteTask = async () => {
-    if (!task || !user || user.role !== "assigner" || task.assigner_id !== Number(user.id)) return
+    if (!task || !user || user.role !== "assigner" || task.assignerId !== Number(user.id)) return
 
     try {
       setUpdating(true)
@@ -123,8 +123,8 @@ export default function TaskDetailPage() {
   if (!user) return null
 
   const isAssigner = user.role === "assigner"
-  const canEdit = isAssigner && task?.assigner_id === Number(user.id)
-  const canUpdateStatus = !isAssigner && task?.assignee_id === Number(user.id)
+  const canEdit = isAssigner && task?.assignerId === Number(user.id)
+  const canUpdateStatus = !isAssigner && task?.assigneeId === Number(user.id)
 
   if (loading) {
     return (
@@ -216,7 +216,7 @@ export default function TaskDetailPage() {
               <div className="flex items-start justify-between flex-wrap gap-2">
                 <div>
                   <CardTitle className="text-2xl break-words">{task.title}</CardTitle>
-                  <CardDescription>Created on {new Date(task.created_at).toLocaleDateString()}</CardDescription>
+                  <CardDescription>Created on {task.createdAt?.toLocaleDateString()}</CardDescription>
                 </div>
                 <PriorityBadge priority={task.priority as "low" | "medium" | "high"} size="lg" />
               </div>
@@ -234,14 +234,14 @@ export default function TaskDetailPage() {
                       <Calendar className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Due Date</p>
-                        <p className="text-sm text-muted-foreground">{new Date(task.due_date).toLocaleDateString()}</p>
+                        <p className="text-sm text-muted-foreground">{new Date(task.dueDate).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Assigned To</p>
-                        <p className="text-sm text-muted-foreground">{task.assignee_name}</p>
+                        <p className="text-sm text-muted-foreground">{task.assigneeName}</p>
                       </div>
                     </div>
                   </div>
@@ -250,14 +250,14 @@ export default function TaskDetailPage() {
                       <User className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Assigned By</p>
-                        <p className="text-sm text-muted-foreground">{task.assigner_name}</p>
+                        <p className="text-sm text-muted-foreground">{task.assignerName}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-5 w-5 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Last Updated</p>
-                        <p className="text-sm text-muted-foreground">{new Date(task.updated_at).toLocaleString()}</p>
+                        <p className="text-sm text-muted-foreground">{task.updatedAt?.toLocaleString()}</p>
                       </div>
                     </div>
                   </div>
@@ -310,7 +310,7 @@ export default function TaskDetailPage() {
             </CardContent>
             <CardFooter className="flex flex-col items-start">
               <p className="text-xs text-muted-foreground">
-                Last updated: {new Date(task.updated_at).toLocaleString()}
+                Last updated: {task.updatedAt?.toLocaleString()}
               </p>
             </CardFooter>
           </Card>

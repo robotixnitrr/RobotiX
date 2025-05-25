@@ -9,7 +9,8 @@ import type { User } from "@/lib/models"
 type AuthContextType = {
   user: User | null
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string, role: "assigner" | "assignee") => Promise<void>
+  register: (name: string, email: string, password: string, role: "assigner" | "assignee", position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'
+  ) => Promise<void>
   logout: () => void
   isLoading: boolean
 }
@@ -115,7 +116,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const register = async (name: string, email: string, password: string, role: "assigner" | "assignee") => {
+  const register = async (name: string, email: string, password: string, role: "assigner" | "assignee", position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members') => {
     try {
       setIsLoading(true)
 
@@ -125,7 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ name, email, password, role, position }),
       })
 
       if (!response.ok) {

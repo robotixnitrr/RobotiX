@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/components/ui/use-toast"
 import { createTask, getAssignees } from "@/lib/actions"
-import type { User } from "@/lib/models"
+import type { User } from "@/db/schema"
 import { Loader2, AlertCircle } from "lucide-react"
 
 // Types for form data and validation
@@ -270,15 +270,26 @@ export default function CreateTaskPage() {
     try {
       setFormState(prev => ({ ...prev, isSubmitting: true }))
 
-      await createTask({
+      // Find the selected assignee to get their name
+      const selectedAssignee = assignees.find(a => a.id?.toString() === formState.data.assigneeId)
+      if (!selectedAssignee) {
+        throw new Error("Selected assignee not found")
+      }
+
+      const taskData = {
         title: formState.data.title.trim(),
         description: formState.data.description.trim(),
-        status: "pending",
+        status: "pending" as const,
         priority: formState.data.priority,
-        due_date: formState.data.dueDate,
-        assigner_id: Number(user.id),
-        assignee_id: Number(formState.data.assigneeId),
-      })
+        dueDate: formState.data.dueDate,
+        assignerId: Number(user.id),
+        assignerName: user.name,
+        assigneeId: Number(formState.data.assigneeId),
+        assigneeName: selectedAssignee.name,
+      }
+
+      console.log("Submitting task data:", taskData)
+      await createTask(taskData)
 
       toast({
         title: "Task created",
@@ -287,10 +298,18 @@ export default function CreateTaskPage() {
 
       router.push("/dashboard/tasks")
     } catch (error) {
+      console.error("Task creation error:", error)
+      
+      // More detailed error logging
+      if (error instanceof Error) {
+        console.error("Error message:", error.message)
+        console.error("Error stack:", error.stack)
+      }
+      
       toast({
-        variant: "destructive",
+        variant: "destructive", 
         title: "Failed to create task",
-        description: "There was an error creating your task. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error creating your task. Please try again.",
       })
     } finally {
       setFormState(prev => ({ ...prev, isSubmitting: false }))

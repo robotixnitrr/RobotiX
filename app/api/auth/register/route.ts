@@ -1,54 +1,70 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { sql, initDb } from "@/lib/db"
+import { type NextRequest, NextResponse } from "next/server";
+import { db } from "@/db"; // adjust import path based on your structure
+import { users } from "@/db/schema"; // your drizzle users table
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
-  await initDb()
-
   try {
-    const body = await request.json()
-    const { name, email, password, role } = body
+    const body = await request.json();
+    const { name, email, password, role, position } = body;
 
     // Validate input
-    if (!name || !email || !password || !role) {
-      return NextResponse.json({ error: "All fields are required" }, { status: 400 })
+    if (!name || !email || !password || !role || !position) {
+      return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
     if (!["assigner", "assignee"].includes(role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 })
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    console.log("Attempting registration for:", email)
+    const validPositions = [
+      "overall-cordinator",
+      "head-coordinator",
+      "core-coordinator",
+      "executive",
+      "members",
+    ];
+    if (!validPositions.includes(position)) {
+      return NextResponse.json({ error: "Invalid position" }, { status: 400 });
+    }
+
+    console.log("Attempting registration for:", email);
 
     // Check if user already exists
-    const existingUsers = await sql`
-      SELECT id FROM users WHERE email = ${email} LIMIT 1
-    `
+    const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-    if (existingUsers.length > 0) {
-      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
+    if (existing.length > 0) {
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
     // Create user
-    const result = await sql`
-      INSERT INTO users (name, email, password, role)
-      VALUES (${name}, ${email}, ${password}, ${role})
-      RETURNING id, name, email, role, created_at, updated_at
-    `
+    const insertedUsers = await db
+      .insert(users)
+      .values({ name, email, password, role, position })
+      .returning({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: users.role,
+        position: users.position,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      });
 
-    const user = result[0]
+    const user = insertedUsers[0];
 
-    console.log("Registration successful for:", user.email)
+    console.log("Registration successful for:", user.email);
 
     return NextResponse.json({
       success: true,
       user,
       message: "Registration successful",
-    })
+    });
   } catch (error) {
-    console.error("Registration error:", error)
+    console.error("Registration error:", error);
 
     if (error instanceof Error && error.message.includes("duplicate key")) {
-      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
     return NextResponse.json(
@@ -57,6 +73,6 @@ export async function POST(request: NextRequest) {
         details: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
-    )
+    );
   }
 }

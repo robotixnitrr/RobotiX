@@ -19,11 +19,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
 import { getTasks, getAssignees } from "@/lib/actions"
-import type { Task, User } from "@/lib/models"
-import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search } from "lucide-react"
+import type { Task, User } from "@/db/schema"
+import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search, AlertCircle } from "lucide-react"
 
 export default function TasksPage() {
   const { user } = useAuth()
@@ -33,6 +34,9 @@ export default function TasksPage() {
   const [assignees, setAssignees] = useState<User[]>([])
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
+  const [tasksLoading, setTasksLoading] = useState(false)
+  const [assigneesLoading, setAssigneesLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all")
   const [priorityFilter, setPriorityFilter] = useState("all")
@@ -45,22 +49,57 @@ export default function TasksPage() {
 
       try {
         setLoading(true)
+        setError(null)
+        setTasksLoading(true)
+        setAssigneesLoading(true)
+
+        // Show loading toast for better UX
+        const loadingToast = toast({
+          title: "Loading tasks...",
+          description: "Please wait while we fetch your data.",
+        })
 
         // Fetch tasks and assignees in parallel
-        const [fetchedTasks, fetchedAssignees] = await Promise.all([getTasks(), getAssignees()])
+        const [fetchedTasks, fetchedAssignees] = await Promise.all([
+          getTasks().finally(() => setTasksLoading(false)),
+          getAssignees().finally(() => setAssigneesLoading(false))
+        ])
 
         setTasks(fetchedTasks)
         setFilteredTasks(fetchedTasks)
         setAssignees(fetchedAssignees)
+
+        // Dismiss loading toast and show success
+        loadingToast.dismiss?.()
+        
+        toast({
+          title: "Tasks loaded successfully",
+          description: `Found ${fetchedTasks.length} task${fetchedTasks.length !== 1 ? 's' : ''}`,
+        })
+
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
         console.error("Failed to load tasks:", error)
+        setError(errorMessage)
+        
         toast({
           variant: "destructive",
-          title: "Error loading tasks",
-          description: error instanceof Error ? error.message : "An unknown error occurred",
+          title: "Failed to load tasks",
+          description: errorMessage,
+          action: (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadData()}
+            >
+              Retry
+            </Button>
+          ),
         })
       } finally {
         setLoading(false)
+        setTasksLoading(false)
+        setAssigneesLoading(false)
       }
     }
 
@@ -90,12 +129,12 @@ export default function TasksPage() {
 
     // Apply assignee filter
     if (assigneeFilter !== "all") {
-      result = result.filter((task) => task.assignee_id === Number(assigneeFilter))
+      result = result.filter((task) => task.assigneeId === Number(assigneeFilter))
     }
 
     // Apply assigner filter
     if (assignerFilter !== "all") {
-      result = result.filter((task) => task.assigner_id === Number(assignerFilter))
+      result = result.filter((task) => task.assignerId === Number(assignerFilter))
     }
 
     setFilteredTasks(result)
@@ -103,12 +142,97 @@ export default function TasksPage() {
 
   // Get unique assigners for filter dropdown
   const uniqueAssigners = Array.from(
-    new Set(tasks.map((task) => ({ id: task.assigner_id, name: task.assigner_name }))),
+    new Set(tasks.map((task) => ({ id: task.assignerId, name: task.assignerName }))),
   ).filter((assigner, index, self) => self.findIndex((a) => a.id === assigner.id) === index)
+
+  const handleResetFilters = () => {
+    setSearchQuery("")
+    setStatusFilter("all")
+    setPriorityFilter("all")
+    setAssigneeFilter("all")
+    setAssignerFilter("all")
+    
+    toast({
+      title: "Filters reset",
+      description: "All filters have been cleared.",
+    })
+  }
 
   if (!user) return null
 
   const isAssigner = user.role === "assigner"
+
+  // Loading skeleton component
+  const LoadingSkeleton = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-10 w-32" />
+      </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <Skeleton className="h-10 flex-1 max-w-sm" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full" />
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+
+  // Error state component
+  const ErrorState = () => (
+    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
+      <AlertCircle className="h-10 w-10 text-destructive" />
+      <h3 className="mt-4 text-lg font-semibold">Failed to load tasks</h3>
+      <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+      <Button 
+        className="mt-4" 
+        onClick={() => window.location.reload()}
+        variant="outline"
+      >
+        Try Again
+      </Button>
+    </div>
+  )
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <LoadingSkeleton />
+      </DashboardLayout>
+    )
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6 w-full">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+            <h2 className="text-2xl font-bold tracking-tight">Tasks</h2>
+          </div>
+          <Card>
+            <CardContent className="p-6">
+              <ErrorState />
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout>
@@ -136,19 +260,15 @@ export default function TasksPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="max-w-sm"
+                    disabled={tasksLoading}
                   />
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => {
-                      setSearchQuery("")
-                      setStatusFilter("all")
-                      setPriorityFilter("all")
-                      setAssigneeFilter("all")
-                      setAssignerFilter("all")
-                    }}
+                    onClick={handleResetFilters}
+                    disabled={tasksLoading || assigneesLoading}
                   >
                     Reset Filters
                   </Button>
@@ -156,7 +276,11 @@ export default function TasksPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select 
+                  value={statusFilter} 
+                  onValueChange={setStatusFilter}
+                  disabled={tasksLoading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
@@ -168,7 +292,11 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <Select 
+                  value={priorityFilter} 
+                  onValueChange={setPriorityFilter}
+                  disabled={tasksLoading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by priority" />
                   </SelectTrigger>
@@ -180,9 +308,14 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
+                <Select 
+                  value={assigneeFilter} 
+                  onValueChange={setAssigneeFilter}
+                  disabled={assigneesLoading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by assignee" />
+                    {assigneesLoading && <Loader2 className="h-4 w-4 animate-spin ml-2" />}
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Assignees</SelectItem>
@@ -194,7 +327,11 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select value={assignerFilter} onValueChange={setAssignerFilter}>
+                <Select 
+                  value={assignerFilter} 
+                  onValueChange={setAssignerFilter}
+                  disabled={tasksLoading}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Filter by assigner" />
                   </SelectTrigger>
@@ -210,9 +347,18 @@ export default function TasksPage() {
               </div>
             </div>
 
-            {loading ? (
+            {(tasksLoading || assigneesLoading) ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="flex items-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="text-muted-foreground">
+                    {tasksLoading && assigneesLoading 
+                      ? "Loading tasks and assignees..." 
+                      : tasksLoading 
+                        ? "Loading tasks..." 
+                        : "Loading assignees..."}
+                  </span>
+                </div>
               </div>
             ) : filteredTasks.length > 0 ? (
               <div className="mt-6 overflow-x-auto">
@@ -241,10 +387,10 @@ export default function TasksPage() {
                               <StatusBadge status={task.status as "pending" | "in-progress" | "completed"} />
                             </TableCell>
                             <TableCell className="whitespace-nowrap">
-                              {new Date(task.due_date).toLocaleDateString()}
+                              {new Date(task.dueDate).toLocaleDateString()}
                             </TableCell>
-                            <TableCell className="max-w-[150px] truncate">{task.assignee_name}</TableCell>
-                            <TableCell className="max-w-[150px] truncate">{task.assigner_name}</TableCell>
+                            <TableCell className="max-w-[150px] truncate">{task.assigneeName}</TableCell>
+                            <TableCell className="max-w-[150px] truncate">{task.assignerName}</TableCell>
                             <TableCell>
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -259,12 +405,12 @@ export default function TasksPage() {
                                   <DropdownMenuItem asChild>
                                     <Link href={`/dashboard/tasks/${task.id}`}>View Details</Link>
                                   </DropdownMenuItem>
-                                  {isAssigner && task.assigner_id === Number(user.id) && (
+                                  {isAssigner && task.assignerId === Number(user.id) && (
                                     <DropdownMenuItem asChild>
                                       <Link href={`/dashboard/tasks/${task.id}/edit`}>Edit Task</Link>
                                     </DropdownMenuItem>
                                   )}
-                                  {!isAssigner && task.assignee_id === Number(user.id) && (
+                                  {!isAssigner && task.assigneeId === Number(user.id) && (
                                     <DropdownMenuItem asChild>
                                       <Link href={`/dashboard/tasks/${task.id}`}>Update Status</Link>
                                     </DropdownMenuItem>

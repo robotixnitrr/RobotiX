@@ -1,389 +1,216 @@
-import { sql } from "./db"
-import type { User, Task, CreateUserInput, CreateTaskInput, UpdateTaskInput } from "./models"
+import { db } from "@/db"
+import { CreateTaskInput, CreateUserInput, tasks, UpdateTaskInput, users } from "@/db/schema"
+import { eq, and, sql, ilike, inArray, or } from "drizzle-orm"
+import { alias } from "drizzle-orm/pg-core"
 
-// User Repository
 export class UserRepository {
-  static async findByEmail(email: string): Promise<User | null> {
-    try {
-      const result = await sql`
-        SELECT id, name, email, password, role, created_at, updated_at 
-        FROM users 
-        WHERE email = ${email}
-        LIMIT 1
-      `
-      return result[0] as User || null
-    } catch (error) {
-      console.error("Error finding user by email:", error)
-      throw new Error("Failed to find user")
-    }
+  static async findByEmail(email: string) {
+    const result = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    })
+    return result
   }
 
-  static async findById(id: number): Promise<User | null> {
-    try {
-      const result = await sql`
-        SELECT id, name, email, role, created_at, updated_at 
-        FROM users 
-        WHERE id = ${id}
-        LIMIT 1
-      `
-      return result[0] as User || null
-    } catch (error) {
-      console.error("Error finding user by ID:", error)
-      throw new Error("Failed to find user")
-    }
+  static async findById(id: number) {
+    const result = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    })
+    return result
   }
 
-  static async create(userData: CreateUserInput): Promise<User> {
+  static async create(userData: CreateUserInput) {
     try {
-      const result = await sql`
-        INSERT INTO users (name, email, password, role)
-        VALUES (${userData.name}, ${userData.email}, ${userData.password}, ${userData.role})
-        RETURNING id, name, email, role, created_at, updated_at
-      `
-      return result[0] as User
-    } catch (error) {
-      console.error("Error creating user:", error)
-      if (error instanceof Error && error.message.includes("duplicate key")) {
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .returning()
+      return user
+    } catch (error: any) {
+      if (error.message.includes("duplicate key")) {
         throw new Error("User with this email already exists")
       }
       throw new Error("Failed to create user")
     }
   }
 
-  static async findAssignees(): Promise<User[]> {
-    try {
-      const result = await sql`
-        SELECT id, name, email, role, created_at, updated_at 
-        FROM users 
-        WHERE role = 'assignee'
-        ORDER BY name ASC
-      `
-      return result as User[]
-    } catch (error) {
-      console.error("Error finding assignees:", error)
-      throw new Error("Failed to find assignees")
-    }
+  static async findAssignees() {
+    return db
+      .select()
+      .from(users)
+      .where(eq(users.role, "assignee"))
+      .orderBy(users.name)
   }
 
-  static async findAll(): Promise<User[]> {
-    try {
-      const result = await sql`
-        SELECT id, name, email, role, created_at, updated_at 
-        FROM users 
-        ORDER BY created_at DESC
-      `
-      return result as User[]
-    } catch (error) {
-      console.error("Error finding all users:", error)
-      throw new Error("Failed to find users")
-    }
+  static async findAll() {
+    return db
+      .select()
+      .from(users)
+      .orderBy(users.createdAt)
   }
 
-  static async update(id: number, updates: Partial<User>): Promise<User | null> {
-    try {
-      const setClause = Object.keys(updates)
-        .filter((key) => key !== "id" && key !== "created_at")
-        .map((key) => `${key} = $${Object.keys(updates).indexOf(key) + 2}`)
-        .join(", ")
-
-      if (!setClause) return null
-
-      const values = [
-        id,
-        ...Object.values(updates).filter(
-          (_, index) => Object.keys(updates)[index] !== "id" && Object.keys(updates)[index] !== "created_at",
-        ),
-      ]
-
-      const result = await sql`
-        UPDATE users 
-        SET ${sql.unsafe(setClause)}, updated_at = CURRENT_TIMESTAMP
-        WHERE id = ${id}
-        RETURNING id, name, email, role, created_at, updated_at
-      `
-      return result[0] as User || null
-    } catch (error) {
-      console.error("Error updating user:", error)
-      throw new Error("Failed to update user")
-    }
+  static async update(id: number, updates: Partial<typeof users.$inferInsert>) {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning()
+    return updatedUser ?? null
   }
 
-  static async delete(id: number): Promise<boolean> {
-    try {
-      const result: any = await sql`
-        DELETE FROM users 
-        WHERE id = ${id}
-      `
-      return result.count > 0
-    } catch (error) {
-      console.error("Error deleting user:", error)
-      throw new Error("Failed to delete user")
-    }
+  static async delete(id: number) {
+    const result = await db.delete(users).where(eq(users.id, id))
+    return result?.rowCount && result.rowCount > 0
   }
 }
 
-// Task Repository
+const filters = {
+  status: ["pending", "completed"] as const,
+}
+
+// Helper function to get the base query structure
+const getBaseTaskQuery = () => {
+  const assignee = alias(users, "assignee");
+  const assigner = alias(users, "assigner");
+
+  return db
+    .select({
+      id: tasks.id,
+      title: tasks.title,
+      description: tasks.description,
+      status: tasks.status,
+      priority: tasks.priority,
+      dueDate: tasks.dueDate,
+      createdAt: tasks.createdAt,
+      updatedAt: tasks.updatedAt,
+      assigneeId: tasks.assigneeId,
+      assignerId: tasks.assignerId,
+      assigneeName: tasks.assigneeName,
+      assignerName: tasks.assignerName,
+    })
+    .from(tasks)
+    .leftJoin(assignee, eq(assignee.id, tasks.assigneeId))
+    .leftJoin(assigner, eq(assigner.id, tasks.assignerId));
+};
+
 export class TaskRepository {
-  static async findAll(): Promise<Task[]> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error finding all tasks:", error)
-      throw new Error("Failed to find tasks")
-    }
+  static async findAll() {
+    return getBaseTaskQuery();
   }
 
-  static async findById(id: number): Promise<Task | null> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        WHERE id = ${id}
-        LIMIT 1
-      `
-      return result[0] as Task || null
-    } catch (error) {
-      console.error("Error finding task by ID:", error)
-      throw new Error("Failed to find task")
-    }
+  static async findById(id: number) {
+    return db.query.tasks.findFirst({ where: eq(tasks.id, id) })
   }
 
-  static async findByAssignee(assigneeId: number): Promise<Task[]> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        WHERE assignee_id = ${assigneeId}
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error finding tasks by assignee:", error)
-      throw new Error("Failed to find tasks")
-    }
+  static async findByAssignee(assigneeId: number) {
+    return getBaseTaskQuery()
+      .where(eq(tasks.assigneeId, assigneeId))
+      .orderBy(sql`${tasks.createdAt} DESC`);
   }
 
-  static async findByAssigner(assignerId: number): Promise<Task[]> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        WHERE assigner_id = ${assignerId}
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error finding tasks by assigner:", error)
-      throw new Error("Failed to find tasks")
-    }
+  static async findByAssigner(assignerId: number) {
+    return getBaseTaskQuery()
+      .where(eq(tasks.assignerId, assignerId))
+      .orderBy(sql`${tasks.createdAt} DESC`);
   }
 
-  static async create(taskData: CreateTaskInput): Promise<Task> {
-    try {
-      const result = await sql`
-        INSERT INTO tasks (
-          title, description, status, priority, due_date,
-          assigner_id, assigner_name, assignee_id, assignee_name
-        )
-        VALUES (
-          ${taskData.title}, ${taskData.description}, ${taskData.status}, 
-          ${taskData.priority}, ${taskData.due_date}, ${taskData.assigner_id}, 
-          ${taskData.assigner_name}, ${taskData.assignee_id}, ${taskData.assignee_name}
-        )
-        RETURNING *
-      `
-      return result[0] as Task
-    } catch (error) {
-      console.error("Error creating task:", error)
-      throw new Error("Failed to create task")
-    }
+  static async create(taskData: CreateTaskInput) {
+    const [task] = await db.insert(tasks).values(taskData).returning()
+    return task
   }
 
-  static async update(id: number, updates: UpdateTaskInput): Promise<Task | null> {
-    try {
-      const updateFields = []
-      const values = []
-      let paramIndex = 1
-
-      if (updates.title !== undefined) {
-        updateFields.push(`title = $${paramIndex++}`)
-        values.push(updates.title)
-      }
-      if (updates.description !== undefined) {
-        updateFields.push(`description = $${paramIndex++}`)
-        values.push(updates.description)
-      }
-      if (updates.status !== undefined) {
-        updateFields.push(`status = $${paramIndex++}`)
-        values.push(updates.status)
-      }
-      if (updates.priority !== undefined) {
-        updateFields.push(`priority = $${paramIndex++}`)
-        values.push(updates.priority)
-      }
-      if (updates.due_date !== undefined) {
-        updateFields.push(`due_date = $${paramIndex++}`)
-        values.push(updates.due_date)
-      }
-      if (updates.assignee_id !== undefined) {
-        updateFields.push(`assignee_id = $${paramIndex++}`)
-        values.push(updates.assignee_id)
-      }
-      if (updates.assignee_name !== undefined) {
-        updateFields.push(`assignee_name = $${paramIndex++}`)
-        values.push(updates.assignee_name)
-      }
-
-      if (updateFields.length === 0) return null
-
-      updateFields.push(`updated_at = CURRENT_TIMESTAMP`)
-      values.push(id)
-
-      const query = `
-        UPDATE tasks
-        SET ${updateFields.join(", ")}
-        WHERE id = $${values.length}
-        RETURNING *
-      `
-      // const result = await sql`
-      //   UPDATE tasks 
-      //   SET ${sql.unsafe(updateFields.join(", "))}
-      //   WHERE id = ${paramIndex}
-      //   RETURNING *
-      // `
-      const result = await sql.query(query, values)
-      return result[0] as Task || null
-    } catch (error) {
-      console.error("Error updating task:", error)
-      throw new Error("Failed to update task")
-    }
+  static async update(id: number, updates: UpdateTaskInput) {
+    const [task] = await db
+      .update(tasks)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(tasks.id, id))
+      .returning()
+    return task ?? null
   }
 
-  static async delete(id: number): Promise<boolean> {
-    try {
-      const result: any = await sql`
-        DELETE FROM tasks 
-        WHERE id = ${id}
-      `
-      return result.count > 0
-    } catch (error) {
-      console.error("Error deleting task:", error)
-      throw new Error("Failed to delete task")
-    }
+  static async delete(id: number) {
+    const result = await db.delete(tasks).where(eq(tasks.id, id))
+    return result?.rowCount && result.rowCount > 0
   }
 
-  static async findByStatus(status: string): Promise<Task[]> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        WHERE status = ${status}
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error finding tasks by status:", error)
-      throw new Error("Failed to find tasks")
-    }
+  static async findByStatus(status: string) {
+    return getBaseTaskQuery()
+      .where(eq(tasks.status, status as "pending" | "in-progress" | "completed"))
+      .orderBy(sql`${tasks.createdAt} DESC`);
   }
 
-  static async findByPriority(priority: string): Promise<Task[]> {
-    try {
-      const result = await sql`
-        SELECT * FROM tasks 
-        WHERE priority = ${priority}
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error finding tasks by priority:", error)
-      throw new Error("Failed to find tasks")
-    }
+  static async findByPriority(priority: string) {
+    return getBaseTaskQuery()
+      .where(eq(tasks.priority, priority as "low" | "medium" | "high"))
+      .orderBy(sql`${tasks.createdAt} DESC`);
   }
 
-  static async count(): Promise<number> {
-    try {
-      const result = await sql`
-        SELECT COUNT(*) as count FROM tasks
-      `
-      return Number.parseInt(result[0].count)
-    } catch (error) {
-      console.error("Error counting tasks:", error)
-      throw new Error("Failed to count tasks")
-    }
+  static async count() {
+    const [{ count }] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(tasks)
+    return Number(count)
   }
 
   static async getStats() {
-    try {
-      const result = await sql`
-        SELECT 
-          COUNT(*) as total,
-          COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
-          COUNT(CASE WHEN status = 'in-progress' THEN 1 END) as in_progress,
-          COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
-          COUNT(CASE WHEN priority = 'high' THEN 1 END) as high_priority,
-          COUNT(CASE WHEN priority = 'medium' THEN 1 END) as medium_priority,
-          COUNT(CASE WHEN priority = 'low' THEN 1 END) as low_priority
-        FROM tasks
-      `
-      return {
-        total: Number.parseInt(result[0].total),
-        pending: Number.parseInt(result[0].pending),
-        inProgress: Number.parseInt(result[0].in_progress),
-        completed: Number.parseInt(result[0].completed),
-        highPriority: Number.parseInt(result[0].high_priority),
-        mediumPriority: Number.parseInt(result[0].medium_priority),
-        lowPriority: Number.parseInt(result[0].low_priority),
-      }
-    } catch (error) {
-      console.error("Error getting task stats:", error)
-      throw new Error("Failed to get task statistics")
+    const result = await db.execute(sql`
+    SELECT 
+      COUNT(*) as total,
+      COUNT(*) FILTER (WHERE status = 'pending') as pending,
+      COUNT(*) FILTER (WHERE status = 'in-progress') as in_progress,
+      COUNT(*) FILTER (WHERE status = 'completed') as completed,
+      COUNT(*) FILTER (WHERE priority = 'high') as high_priority,
+      COUNT(*) FILTER (WHERE priority = 'medium') as medium_priority,
+      COUNT(*) FILTER (WHERE priority = 'low') as low_priority
+    FROM tasks
+  `)
+
+    const row = (result as any).rows?.[0]
+
+    return {
+      total: Number(row.total),
+      pending: Number(row.pending),
+      inProgress: Number(row.in_progress),
+      completed: Number(row.completed),
+      highPriority: Number(row.high_priority),
+      mediumPriority: Number(row.medium_priority),
+      lowPriority: Number(row.low_priority),
     }
   }
 
   static async search(
     query: string,
     filters?: {
-      status?: string[]
-      priority?: string[]
-      assigneeId?: number
-      assignerId?: number
-    },
-  ): Promise<Task[]> {
-    try {
-      let whereClause = `WHERE (title ILIKE $1 OR description ILIKE $1)`
-      const values = [`%${query}%`]
-      let paramIndex = 2
-
-      if (filters?.status?.length) {
-        whereClause += ` AND status = ANY($${paramIndex++})`
-        values.push(`{${filters.status.map(s => `"${s}"`).join(",")}}`)
-      }
-
-      if (filters?.priority?.length) {
-        whereClause += ` AND priority = ANY($${paramIndex++})`
-        values.push(`{${filters.priority.map(p => `"${p}"`).join(",")}}`)
-      }
-
-      if (filters?.assigneeId) {
-        whereClause += ` AND assignee_id = $${paramIndex++}`
-        values.push(filters.assigneeId.toString())
-      }
-
-      if (filters?.assignerId) {
-        whereClause += ` AND assigner_id = $${paramIndex++}`
-        values.push(filters.assignerId.toString())
-      }
-
-      const result = await sql`
-        SELECT * FROM tasks 
-        ${sql.unsafe(whereClause)}
-        ORDER BY created_at DESC
-      `
-      return result as Task[]
-    } catch (error) {
-      console.error("Error searching tasks:", error)
-      throw new Error("Failed to search tasks")
+      status?: string[];
+      priority?: string[];
+      assigneeId?: number;
+      assignerId?: number;
     }
+  ) {
+    const whereConditions = [
+      or(
+        ilike(tasks.title, `%${query}%`),
+        ilike(tasks.description, `%${query}%`)
+      ),
+    ];
+
+    if (filters?.status?.length) {
+      whereConditions.push(inArray(tasks.status, filters.status as any));
+    }
+
+    if (filters?.priority?.length) {
+      whereConditions.push(inArray(tasks.priority, filters.priority as any));
+    }
+
+    if (filters?.assigneeId) {
+      whereConditions.push(eq(tasks.assigneeId, filters.assigneeId));
+    }
+
+    if (filters?.assignerId) {
+      whereConditions.push(eq(tasks.assignerId, filters.assignerId));
+    }
+
+    return getBaseTaskQuery()
+      .where(and(...whereConditions))
+      .orderBy(sql`${tasks.createdAt} DESC`);
   }
 }
