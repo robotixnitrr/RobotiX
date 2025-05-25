@@ -8,11 +8,13 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata = {
-  title: "TaskFlow - Task Management Application",
+  title: "ROBOTIx TaskFlow - Task Management Application",
   description: "A modern task management application for teams",
-    generator: 'v0.dev'
+  icons: {
+    icon: "/logoWhite.png", // or "/favicon.png" or "/favicon.svg"
+    shortcut: "/favicon.ico",
+  },
 }
-
 export default function RootLayout({
   children,
 }: {
