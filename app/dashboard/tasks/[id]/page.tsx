@@ -20,17 +20,19 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
-import { deleteTask, getTask, updateTask, updateTaskStatus } from "@/lib/actions"
-import type { Task } from "@/db/schema"
-import { ArrowLeft, Calendar, Edit, Loader2, Trash, User } from "lucide-react"
+import { deleteTask, getTask, updateTaskStatus } from "@/lib/actions"
+import type { TaskWithTypedAssignees } from "@/db/schema"
+import type { Assignee } from "@/lib/types"
+import { ArrowLeft, Calendar, Edit, Loader2, Trash, User, Clock, Users } from "lucide-react"
 
 export default function TaskDetailPage() {
   const { user } = useAuth()
   const { id } = useParams()
   const router = useRouter()
   const { toast } = useToast()
-  const [task, setTask] = useState<Task | null>(null)
+  const [task, setTask] = useState<TaskWithTypedAssignees | null>(null)
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -45,8 +47,13 @@ export default function TaskDetailPage() {
         const fetchedTask = await getTask(taskId)
 
         if (fetchedTask) {
-          setTask(fetchedTask)
-          setNewStatus(fetchedTask.status)
+          // Type cast the fetched task to include typed assignees
+          const typedTask: TaskWithTypedAssignees = {
+            ...fetchedTask,
+            assignees: (fetchedTask.assignees as Assignee[]) || []
+          }
+          setTask(typedTask)
+          setNewStatus(typedTask.status)
         } else {
           toast({
             variant: "destructive",
@@ -75,10 +82,14 @@ export default function TaskDetailPage() {
 
     try {
       setUpdating(true)
-      const updatedTask = await updateTaskStatus(task.id, newStatus as "pending" | "in-progress" | "completed",)
+      const updatedTask = await updateTaskStatus(task.id, newStatus as "pending" | "in-progress" | "completed")
 
       if (updatedTask) {
-        setTask(updatedTask)
+        const typedUpdatedTask: TaskWithTypedAssignees = {
+          ...updatedTask,
+          assignees: (updatedTask.assignees as Assignee[]) || []
+        }
+        setTask(typedUpdatedTask)
         toast({
           title: "Status updated",
           description: "The task status has been updated successfully.",
@@ -96,7 +107,7 @@ export default function TaskDetailPage() {
   }
 
   const handleDeleteTask = async () => {
-    if (!task || !user || user.role !== "assigner" || task.assignerId !== Number(user.id)) return
+    if (!task || !user || task.assignerId !== Number(user.id)) return
 
     try {
       setUpdating(true)
@@ -122,9 +133,17 @@ export default function TaskDetailPage() {
 
   if (!user) return null
 
-  const isAssigner = user.role === "assigner"
-  const canEdit = isAssigner && task?.assignerId === Number(user.id)
-  const canUpdateStatus = !isAssigner && task?.assigneeId === Number(user.id)
+  // Check permissions - user can edit if they are the assigner
+  const canEdit = task?.assignerId === Number(user.id)
+  
+  // Check if user can update status - if they are currently assigned to the task
+  const isCurrentlyAssigned = task?.assignees.some(assignee => assignee.id === Number(user.id))
+  const canUpdateStatus = isCurrentlyAssigned
+
+  // Get current assignee (most recent one)
+  const currentAssignee = task?.assignees && task.assignees.length > 0 
+    ? task.assignees[task.assignees.length - 1] 
+    : null
 
   if (loading) {
     return (
@@ -240,8 +259,15 @@ export default function TaskDetailPage() {
                     <div className="flex items-center gap-2">
                       <User className="h-5 w-5 text-muted-foreground" />
                       <div>
-                        <p className="text-sm font-medium">Assigned To</p>
-                        <p className="text-sm text-muted-foreground">{task.assigneeName}</p>
+                        <p className="text-sm font-medium">Currently Assigned To</p>
+                        <p className="text-sm text-muted-foreground">
+                          {currentAssignee ? currentAssignee.name : "No assignee"}
+                        </p>
+                        {currentAssignee && (
+                          <p className="text-xs text-muted-foreground">
+                            Assigned on {new Date(currentAssignee.assignedAt).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -262,6 +288,34 @@ export default function TaskDetailPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Assignment History */}
+                {task.assignees.length > 1 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Clock className="h-5 w-5 text-muted-foreground" />
+                        <h3 className="text-lg font-medium">Assignment History</h3>
+                      </div>
+                      <div className="space-y-2">
+                        {task.assignees.map((assignee, index) => (
+                          <div key={`${assignee.id}-${index}`} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={index === task.assignees.length - 1 ? "default" : "secondary"}>
+                                {index === task.assignees.length - 1 ? "Current" : `Step ${index + 1}`}
+                              </Badge>
+                              <span className="text-sm font-medium">{assignee.name}</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(assignee.assignedAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -306,6 +360,22 @@ export default function TaskDetailPage() {
                     </Button>
                   </>
                 )}
+                
+                {/* Assignment Summary */}
+                <Separator />
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Assignment Summary</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <p>Total assignments: {task.assignees.length}</p>
+                    <p>Created by: {task.assignerName}</p>
+                    {currentAssignee && (
+                      <p>Current assignee: {currentAssignee.name}</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-start">

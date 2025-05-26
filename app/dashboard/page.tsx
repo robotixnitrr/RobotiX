@@ -11,14 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { getTasks, getTaskStats } from "@/lib/actions"
-import type { Task } from "@/db/schema"
+import type { TaskWithTypedAssignees } from "@/db/schema"
 import { ArrowRight, CheckCircle2, Clock, ClipboardList, Loader2, PlusCircle } from "lucide-react"
 import DashboardLayout from "@/components/dashboard-layout"
 
 export default function DashboardPage() {
   const { user } = useAuth()
   const { toast } = useToast()
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<TaskWithTypedAssignees[]>([])
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -62,12 +62,24 @@ export default function DashboardPage() {
 
   if (!user) return null
 
-  const isAssigner = user.role === "assigner"
+  // Determine if user can create tasks (you may need to adjust this logic based on your business rules)
+  // Since role is removed, you might use position or another field to determine permissions
+  const canCreateTasks = user.position === "overall-cordinator" || user.position === "head-coordinator"
 
   // Filter tasks for the current user
-  const userTasks = isAssigner
-    ? tasks.filter((task) => task.assignerId === Number(user.id))
-    : tasks.filter((task) => task.assigneeId === Number(user.id))
+  // Tasks assigned by the user
+  const assignedByUser = tasks.filter((task) => task.assignerId === Number(user.id))
+  
+  // Tasks assigned to the user (current assignee)
+  const assignedToUser = tasks.filter((task) => {
+    const currentAssignee = task.assignees[task.assignees.length - 1] // Get the latest assignee
+    return currentAssignee && currentAssignee.id === Number(user.id)
+  })
+
+  // All tasks related to the user (either assigned by them or assigned to them)
+  const userTasks = [...assignedByUser, ...assignedToUser].filter((task, index, arr) => 
+    arr.findIndex(t => t.id === task.id) === index // Remove duplicates
+  )
 
   const pendingTasks = tasks.filter((task) => task.status === "pending")
   const inProgressTasks = tasks.filter((task) => task.status === "in-progress")
@@ -78,7 +90,7 @@ export default function DashboardPage() {
       <div className="space-y-6 w-full">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-bold tracking-tight">Welcome back, {user.name}</h2>
-          {isAssigner && (
+          {canCreateTasks && (
             <Link href="/dashboard/create-task">
               <Button className="gap-2 whitespace-nowrap">
                 <PlusCircle className="h-4 w-4" />
@@ -151,6 +163,12 @@ export default function DashboardPage() {
                 <TabsTrigger value="my-tasks" className="flex-1 sm:flex-initial">
                   My Tasks
                 </TabsTrigger>
+                <TabsTrigger value="assigned-by-me" className="flex-1 sm:flex-initial">
+                  Assigned by Me
+                </TabsTrigger>
+                <TabsTrigger value="assigned-to-me" className="flex-1 sm:flex-initial">
+                  Assigned to Me
+                </TabsTrigger>
                 <TabsTrigger value="all-tasks" className="flex-1 sm:flex-initial">
                   All Tasks
                 </TabsTrigger>
@@ -176,14 +194,10 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <EmptyState
-                  title={`No ${isAssigner ? "assigned" : "assigned to you"} tasks found`}
-                  description={
-                    isAssigner
-                      ? "You haven't assigned any tasks yet. Create your first task to get started."
-                      : "You don't have any tasks assigned to you yet."
-                  }
+                  title="No tasks found"
+                  description="You don't have any tasks assigned to you or by you yet."
                   action={
-                    isAssigner ? (
+                    canCreateTasks ? (
                       <Link href="/dashboard/create-task">
                         <Button className="gap-2">
                           <PlusCircle className="h-4 w-4" />
@@ -199,6 +213,74 @@ export default function DashboardPage() {
                   <Link href="/dashboard/tasks">
                     <Button variant="outline" className="gap-2">
                       View All Tasks
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="assigned-by-me" className="space-y-4">
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : assignedByUser.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {assignedByUser.slice(0, 8).map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No tasks assigned by you"
+                  description="You haven't assigned any tasks yet."
+                  action={
+                    canCreateTasks ? (
+                      <Link href="/dashboard/create-task">
+                        <Button className="gap-2">
+                          <PlusCircle className="h-4 w-4" />
+                          Create Task
+                        </Button>
+                      </Link>
+                    ) : null
+                  }
+                />
+              )}
+              {assignedByUser.length > 8 && (
+                <div className="flex justify-center">
+                  <Link href="/dashboard/tasks?filter=assigned-by-me">
+                    <Button variant="outline" className="gap-2">
+                      View All Tasks Assigned by Me
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="assigned-to-me" className="space-y-4">
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : assignedToUser.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {assignedToUser.slice(0, 8).map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="No tasks assigned to you"
+                  description="You don't have any tasks assigned to you yet."
+                />
+              )}
+              {assignedToUser.length > 8 && (
+                <div className="flex justify-center">
+                  <Link href="/dashboard/tasks?filter=assigned-to-me">
+                    <Button variant="outline" className="gap-2">
+                      View All Tasks Assigned to Me
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </Link>
@@ -222,7 +304,7 @@ export default function DashboardPage() {
                   title="No tasks found"
                   description="There are no tasks in the system yet."
                   action={
-                    isAssigner ? (
+                    canCreateTasks ? (
                       <Link href="/dashboard/create-task">
                         <Button className="gap-2">
                           <PlusCircle className="h-4 w-4" />

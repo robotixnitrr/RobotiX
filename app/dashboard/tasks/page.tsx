@@ -22,17 +22,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
+import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getTasks, getAssignees } from "@/lib/actions"
-import type { Task, User } from "@/db/schema"
-import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search, AlertCircle } from "lucide-react"
+import type { TaskWithTypedAssignees, User } from "@/db/schema"
+import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search, AlertCircle, History, User as UserIcon } from "lucide-react"
 
 export default function TasksPage() {
   const { user } = useAuth()
   const { toast } = useToast()
   const searchParams = useSearchParams()
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<TaskWithTypedAssignees[]>([])
   const [assignees, setAssignees] = useState<User[]>([])
-  const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
+  const [filteredTasks, setFilteredTasks] = useState<TaskWithTypedAssignees[]>([])
   const [loading, setLoading] = useState(true)
   const [tasksLoading, setTasksLoading] = useState(false)
   const [assigneesLoading, setAssigneesLoading] = useState(false)
@@ -62,7 +64,7 @@ export default function TasksPage() {
         // Fetch tasks and assignees in parallel
         const [fetchedTasks, fetchedAssignees] = await Promise.all([
           getTasks().finally(() => setTasksLoading(false)),
-          getAssignees().finally(() => setAssigneesLoading(false))
+          getAssignees(user.id).finally(() => setAssigneesLoading(false))
         ])
 
         setTasks(fetchedTasks)
@@ -129,7 +131,9 @@ export default function TasksPage() {
 
     // Apply assignee filter
     if (assigneeFilter !== "all") {
-      result = result.filter((task) => task.assigneeId === Number(assigneeFilter))
+      result = result.filter((task) => 
+        task.assignees.some(assignee => assignee.id === Number(assigneeFilter))
+      )
     }
 
     // Apply assigner filter
@@ -144,6 +148,23 @@ export default function TasksPage() {
   const uniqueAssigners = Array.from(
     new Set(tasks.map((task) => ({ id: task.assignerId, name: task.assignerName }))),
   ).filter((assigner, index, self) => self.findIndex((a) => a.id === assigner.id) === index)
+
+  // Helper function to get current assignee
+  const getCurrentAssignee = (assignees: any[]) => {
+    if (!assignees || assignees.length === 0) return null
+    return assignees[assignees.length - 1] // Latest assignee
+  }
+
+  // Helper function to check if task was reassigned
+  const wasReassigned = (assignees: any[]) => {
+    return assignees && assignees.length > 1
+  }
+
+  // Helper function to get assignment history
+  const getAssignmentHistory = (assignees: any[]) => {
+    if (!assignees || assignees.length <= 1) return []
+    return assignees.slice(0, -1) // All except current assignee
+  }
 
   const handleResetFilters = () => {
     setSearchQuery("")
@@ -160,7 +181,13 @@ export default function TasksPage() {
 
   if (!user) return null
 
-  const isAssigner = user.role === "assigner"
+  // Check if user can perform actions (removed role-based check since role is removed)
+  const canCreateTasks = true // You may want to add different logic here
+  const canEditTask = (task: TaskWithTypedAssignees) => task.assignerId === Number(user.id)
+  const canUpdateStatus = (task: TaskWithTypedAssignees) => {
+    const currentAssignee = getCurrentAssignee(task.assignees)
+    return currentAssignee && currentAssignee.id === Number(user.id)
+  }
 
   // Loading skeleton component
   const LoadingSkeleton = () => (
@@ -239,7 +266,7 @@ export default function TasksPage() {
       <div className="space-y-6 w-full">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-bold tracking-tight">Tasks</h2>
-          {isAssigner && (
+          {canCreateTasks && (
             <Link href="/dashboard/create-task">
               <Button className="gap-2 whitespace-nowrap">
                 <PlusCircle className="h-4 w-4" />
@@ -377,49 +404,89 @@ export default function TasksPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {filteredTasks.map((task) => (
-                          <TableRow key={task.id}>
-                            <TableCell className="font-medium max-w-[200px] truncate">{task.title}</TableCell>
-                            <TableCell>
-                              <PriorityBadge priority={task.priority as "low" | "medium" | "high"} />
-                            </TableCell>
-                            <TableCell>
-                              <StatusBadge status={task.status as "pending" | "in-progress" | "completed"} />
-                            </TableCell>
-                            <TableCell className="whitespace-nowrap">
-                              {new Date(task.dueDate).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell className="max-w-[150px] truncate">{task.assigneeName}</TableCell>
-                            <TableCell className="max-w-[150px] truncate">{task.assignerName}</TableCell>
-                            <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">Open menu</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem asChild>
-                                    <Link href={`/dashboard/tasks/${task.id}`}>View Details</Link>
-                                  </DropdownMenuItem>
-                                  {isAssigner && task.assignerId === Number(user.id) && (
-                                    <DropdownMenuItem asChild>
-                                      <Link href={`/dashboard/tasks/${task.id}/edit`}>Edit Task</Link>
-                                    </DropdownMenuItem>
+                        {filteredTasks.map((task) => {
+                          const currentAssignee = getCurrentAssignee(task.assignees)
+                          const isReassigned = wasReassigned(task.assignees)
+                          const history = getAssignmentHistory(task.assignees)
+
+                          return (
+                            <TableRow key={task.id}>
+                              <TableCell className="font-medium max-w-[200px] truncate">{task.title}</TableCell>
+                              <TableCell>
+                                <PriorityBadge priority={task.priority as "low" | "medium" | "high"} />
+                              </TableCell>
+                              <TableCell>
+                                <StatusBadge status={task.status as "pending" | "in-progress" | "completed"} />
+                              </TableCell>
+                              <TableCell className="whitespace-nowrap">
+                                {new Date(task.dueDate).toLocaleDateString()}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1">
+                                    <UserIcon className="h-3 w-3 text-muted-foreground" />
+                                    <span className="max-w-[120px] truncate">
+                                      {currentAssignee?.name || 'Unassigned'}
+                                    </span>
+                                  </div>
+                                  {isReassigned && (
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <Badge variant="secondary" className="gap-1 text-xs">
+                                            <History className="h-3 w-3" />
+                                            {history.length}
+                                          </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="top" className="max-w-xs">
+                                          <div className="space-y-1">
+                                            <p className="font-medium">Assignment History:</p>
+                                            {history.map((assignee, index) => (
+                                              <div key={index} className="text-xs">
+                                                {assignee.name} - {new Date(assignee.assignedAt).toLocaleDateString()}
+                                              </div>
+                                            ))}
+                                            <div className="text-xs border-t pt-1 font-medium">
+                                              Current: {currentAssignee?.name} - {new Date(currentAssignee?.assignedAt || '').toLocaleDateString()}
+                                            </div>
+                                          </div>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
                                   )}
-                                  {!isAssigner && task.assigneeId === Number(user.id) && (
+                                </div>
+                              </TableCell>
+                              <TableCell className="max-w-[150px] truncate">{task.assignerName}</TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                      <MoreHorizontal className="h-4 w-4" />
+                                      <span className="sr-only">Open menu</span>
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                      <Link href={`/dashboard/tasks/${task.id}`}>Update Status</Link>
+                                      <Link href={`/dashboard/tasks/${task.id}`}>View Details</Link>
                                     </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                                    {canEditTask(task) && (
+                                      <DropdownMenuItem asChild>
+                                        <Link href={`/dashboard/tasks/${task.id}/edit`}>Edit Task</Link>
+                                      </DropdownMenuItem>
+                                    )}
+                                    {canUpdateStatus(task) && (
+                                      <DropdownMenuItem asChild>
+                                        <Link href={`/dashboard/tasks/${task.id}`}>Update Status</Link>
+                                      </DropdownMenuItem>
+                                    )}
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
                       </TableBody>
                     </Table>
                   </div>
@@ -436,11 +503,11 @@ export default function TasksPage() {
                   assigneeFilter !== "all" ||
                   assignerFilter !== "all"
                     ? "Try adjusting your filters to find what you're looking for."
-                    : isAssigner
+                    : canCreateTasks
                       ? "You haven't assigned any tasks yet. Create your first task to get started."
                       : "You don't have any tasks assigned to you yet."}
                 </p>
-                {isAssigner && (
+                {canCreateTasks && (
                   <div className="mt-6">
                     <Link href="/dashboard/create-task">
                       <Button className="gap-2">

@@ -1,5 +1,6 @@
-import { pgTable, serial, text, timestamp, integer, date, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer, date, pgEnum, jsonb } from "drizzle-orm/pg-core";
 import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
+import { Assignee } from "@/lib/types";
 
 // Enums
 export const userRoleEnum = pgEnum("role", ["assigner", "assignee"]);
@@ -20,7 +21,6 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: userRoleEnum("role").notNull(),
   position: userPositionEnum("position"),
   lastNotificationReadAt: timestamp("last_notification_read_at", {
     withTimezone: true,
@@ -39,8 +39,9 @@ export const tasks = pgTable("tasks", {
   dueDate: date("due_date").notNull(),
   assignerId: integer("assigner_id").notNull().references(() => users.id),
   assignerName: text("assigner_name").notNull(),
-  assigneeId: integer("assignee_id").notNull().references(() => users.id),
-  assigneeName: text("assignee_name").notNull(),
+  assignees: jsonb("assignees").notNull().default("[]"),
+  // assigneeId: integer("assignee_id").notNull().references(() => users.id),
+  // assigneeName: text("assignee_name").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
@@ -55,10 +56,10 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
     fields: [tasks.assignerId],
     references: [users.id],
   }),
-  assignee: one(users, {
-    fields: [tasks.assigneeId],
-    references: [users.id],
-  }),
+  // assignee: one(users, {
+  //   fields: [tasks.assigneeId],
+  //   references: [users.id],
+  // }),
 }));
 
 
@@ -69,6 +70,9 @@ export type CreateUserInput = InferInsertModel<typeof users>;
 
 // Tasks
 export type Task = InferSelectModel<typeof tasks>;
+export type TaskWithTypedAssignees = Omit<Task, "assignees"> & {
+  assignees: Assignee[];
+};
 export type CreateTaskInput = InferInsertModel<typeof tasks>;
 
 // For updating tasks: omit immutable fields like assignerId

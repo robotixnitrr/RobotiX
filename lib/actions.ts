@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache"
 import { sql } from "drizzle-orm"
 import { TaskRepository, UserRepository } from "@/lib/repositories"
-import type { Task, User, CreateTaskInput, UpdateTaskInput } from "@/db/schema"
+import type { Task, User, CreateTaskInput, UpdateTaskInput, TaskWithTypedAssignees } from "@/db/schema"
+import { db } from "@/db"
+import { users, tasks } from "@/db/schema"
+import { eq } from "drizzle-orm"
+import { Assignee } from "./types"
 
 // Helper: safely parse a date
 function safeParseDate(value: Date | string | null): Date {
@@ -17,30 +21,39 @@ export async function getTasks(filters?: {
   status?: "pending" | "in-progress" | "completed"
   priority?: "low" | "medium" | "high"
   search?: string
-}) {
+}): Promise<TaskWithTypedAssignees[]> {
   try {
-    let tasks;
+    let rawTasks: any[] = [];
 
     if (filters?.assigneeId) {
-      tasks = await TaskRepository.findByAssignee(filters.assigneeId)
+      rawTasks = await TaskRepository.findByAssignee(filters.assigneeId);
     } else if (filters?.assignerId) {
-      tasks = await TaskRepository.findByAssigner(filters.assignerId)
+      rawTasks = await TaskRepository.findByAssigner(filters.assignerId);
     } else if (filters?.status) {
-      tasks = await TaskRepository.findByStatus(filters.status)
+      rawTasks = await TaskRepository.findByStatus(filters.status);
     } else if (filters?.priority) {
-      tasks = await TaskRepository.findByPriority(filters.priority)
+      rawTasks = await TaskRepository.findByPriority(filters.priority);
     } else if (filters?.search) {
-      tasks = await TaskRepository.search(filters.search)
+      rawTasks = await TaskRepository.search(filters.search);
     } else {
-      tasks = await TaskRepository.findAll()
+      rawTasks = await TaskRepository.findAll();
     }
 
-    return tasks
+    // Safely type-cast assignees after query
+    const typedTasks: TaskWithTypedAssignees[] = rawTasks.map(task => ({
+      ...task,
+      assignees: task.assignees as Assignee[],
+    }));
+
+    return typedTasks;
   } catch (error) {
-    console.error("Error in getTasks:", error)
-    throw new Error(`Failed to get tasks: ${error instanceof Error ? error.message : "Unknown error"}`)
+    console.error("Error in getTasks:", error);
+    throw new Error(
+      `Failed to get tasks: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
   }
 }
+
 
 export async function getTask(id: number): Promise<Task | null> {
   try {
@@ -56,9 +69,13 @@ export async function getTask(id: number): Promise<Task | null> {
   }
 }
 
-export async function createTask(taskData: Omit<CreateTaskInput, "assigner_name" | "assignee_name">): Promise<Task> {
+interface CreateTaskInputExtended extends CreateTaskInput {
+  assignee: Assignee;
+}
+
+export async function createTask(taskData: CreateTaskInputExtended): Promise<Task> {
   try {
-    const assignee = await UserRepository.findById(Number(taskData.assigneeId))
+    const assignee = await UserRepository.findById(Number(taskData.assignee.id))
     if (!assignee) throw new Error("Assignee not found")
 
     const assigner = await UserRepository.findById(Number(taskData.assignerId))
@@ -72,8 +89,15 @@ export async function createTask(taskData: Omit<CreateTaskInput, "assigner_name"
       dueDate: taskData.dueDate,
       assignerId: Number(taskData.assignerId),
       assignerName: assigner.name,
-      assigneeId: Number(taskData.assigneeId),
-      assigneeName: assignee.name,
+      assignees: [
+        {
+          id: Number(taskData.assignee.id),
+          name: assignee.name,
+          assignedAt: taskData.assignee.assignedAt || new Date(),
+        }
+      ]
+      // assigneeId: Number(taskData.assigneeId),
+      // assigneeName: assignee.name,
     })
 
     revalidatePath("/dashboard")
@@ -86,13 +110,14 @@ export async function createTask(taskData: Omit<CreateTaskInput, "assigner_name"
   }
 }
 
-export async function updateTask(id: number, updates: UpdateTaskInput): Promise<Task | null> {
+export async function updateTask(id: number, updates: Partial<Omit<CreateTaskInputExtended, "assignerId">>): Promise<Task | null> {
   try {
-    if (updates.assigneeId) {
-      const assignee = await UserRepository.findById(Number(updates.assigneeId))
-      if (!assignee) throw new Error("Assignee not found")
-      updates.assigneeName = assignee.name
-    }
+    // if (updates.assignee) {
+    //   const assignee = await UserRepository.findById(Number(updates?.assignee.id))
+    //   if (!assignee) throw new Error("Assignee not found")
+    //   updates.assignee.name = assignee.name
+    //   updates.assignee.assignedAt = updates.assignee.assignedAt || new Date()
+    // }
 
     const task = await TaskRepository.update(id, updates)
 
@@ -106,6 +131,41 @@ export async function updateTask(id: number, updates: UpdateTaskInput): Promise<
     throw new Error(`Failed to update task: ${error instanceof Error ? error.message : "Unknown error"}`)
   }
 }
+
+export async function addAssigneeToTask(id: number, assignee: Assignee): Promise<Task | null> {
+  try {
+    const task = await TaskRepository.findById(id);
+    if (!task) throw new Error("Task not found");
+
+    const assigner = await UserRepository.findById(task.assignerId);
+    if (!assigner) throw new Error("Assigner not found");
+
+    const currentAssignees = (task.assignees ?? []) as Assignee[];
+
+    const alreadyExists = currentAssignees.some(a => a.id === assignee.id);
+    if (alreadyExists) {
+      throw new Error("Assignee already exists in this task");
+    }
+
+
+    const updatedTask = await TaskRepository.update(id, {
+      assignees: [...currentAssignees, assignee],
+    });
+
+    // Invalidate pages
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/tasks");
+    revalidatePath(`/dashboard/tasks/${id}`);
+
+    return updatedTask;
+  } catch (error) {
+    console.error("Error in addAssigneeToTask:", error);
+    throw new Error(
+      `Failed to add assignee to task: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
+}
+
 
 export async function updateTaskStatus(id: number, status: "pending" | "in-progress" | "completed"): Promise<Task | null> {
   try {
@@ -139,9 +199,9 @@ export async function deleteTask(id: number): Promise<boolean> {
   }
 }
 
-export async function getAssignees(): Promise<User[]> {
+export async function getAssignees(user_id : number): Promise<User[]> {
   try {
-    return await UserRepository.findAssignees()
+    return await UserRepository.findAssignees(user_id)
   } catch (error) {
     console.error("Error in getAssignees:", error)
     throw new Error(`Failed to get assignees: ${error instanceof Error ? error.message : "Unknown error"}`)
@@ -167,19 +227,20 @@ export async function getTaskStats() {
 
 export async function getNotifications(userId: number): Promise<any[]> {
   try {
-    const userResult = await sql`
-      SELECT last_notification_read_at
-      FROM users
-      WHERE id = ${userId}
-    `
-    const lastReadRaw = (userResult as any)[0]?.last_notification_read_at ?? null
-    const lastRead = safeParseDate(lastReadRaw)
+    const user = await db.query.users.findFirst({
+      columns: {
+        lastNotificationReadAt: true,
+      },
+      where: eq(users.id, userId),
+    })
 
-    const tasks = await TaskRepository.findAll()
+    const lastRead = safeParseDate(user?.lastNotificationReadAt ?? null)
 
-    const notifications = tasks
+    const allTasks = await db.query.tasks.findMany()
+
+    const notifications = allTasks
       .map((task) => {
-        const isAssignee = task.assigneeId === userId
+        const isAssignee = task.assignees === userId
         const isAssigner = task.assignerId === userId
 
         if (isAssignee) {
@@ -194,7 +255,7 @@ export async function getNotifications(userId: number): Promise<any[]> {
           return {
             id: `task-${task.id}-completed`,
             title: "Task completed",
-            message: `"${task.title}" has been completed by ${task.assigneeName}`,
+            message: `"${task.title}" has been completed by ${(task.assignees as Assignee[]).at(-1)?.name}`,
             timestamp: task.updatedAt,
             type: "task_completed",
           }
@@ -202,7 +263,7 @@ export async function getNotifications(userId: number): Promise<any[]> {
           return {
             id: `task-${task.id}-progress`,
             title: "Task in progress",
-            message: `"${task.title}" is now in progress by ${task.assigneeName}`,
+            message: `"${task.title}" is now in progress by ${(task.assignees as Assignee[]).at(-1)?.name}`,
             timestamp: task.updatedAt,
             type: "task_updated",
           }
@@ -222,9 +283,8 @@ export async function getNotifications(userId: number): Promise<any[]> {
 }
 
 export async function markNotificationsAsRead(userId: number) {
-  await sql`
-    UPDATE users
-    SET last_notification_read_at = NOW()
-    WHERE id = ${userId}
-  `
+  await db
+    .update(users)
+    .set({ lastNotificationReadAt: new Date() })
+    .where(eq(users.id, userId))
 }

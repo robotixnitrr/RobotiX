@@ -40,12 +40,11 @@ export async function POST(request: NextRequest) {
     // Create user
     const insertedUsers = await db
       .insert(users)
-      .values({ name, email, password, role, position })
+      .values({ name, email, password, position })
       .returning({
         id: users.id,
         name: users.name,
         email: users.email,
-        role: users.role,
         position: users.position,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,

@@ -2,6 +2,8 @@ import { db } from "@/db"
 import { CreateTaskInput, CreateUserInput, tasks, UpdateTaskInput, users } from "@/db/schema"
 import { eq, and, sql, ilike, inArray, or } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
+import { Assignee } from "./types"
+import { positionRank } from "./constants"
 
 export class UserRepository {
   static async findByEmail(email: string) {
@@ -33,13 +35,33 @@ export class UserRepository {
     }
   }
 
-  static async findAssignees() {
+  static async findAssignees(currentUserId: number) {
+    const currentUser = await db.query.users.findFirst({
+      where: (u, { eq }) => eq(u.id, currentUserId),
+    });
+
+    if (!currentUser) throw new Error("Current user not found");
+
+    type Position = keyof typeof positionRank;
+
+    const currentRank = positionRank[currentUser.position as Position];
+
+    // Get positions with equal or lower rank
+    const allowedPositions = Object.entries(positionRank)
+      .filter(([_, rank]) => rank <= currentRank)
+      .map(([pos]) => pos as Position);
+
     return db
       .select()
       .from(users)
-      .where(eq(users.role, "assignee"))
-      .orderBy(users.name)
+      .where(
+        and(
+          inArray(users.position, allowedPositions as readonly Position[])
+        )
+      )
+      .orderBy(users.name);
   }
+
 
   static async findAll() {
     return db
@@ -68,10 +90,9 @@ const filters = {
 }
 
 // Helper function to get the base query structure
-const getBaseTaskQuery = () => {
-  const assignee = alias(users, "assignee");
-  const assigner = alias(users, "assigner");
+const assigner = alias(users, "assigner");
 
+export const getBaseTaskQuery = () => {
   return db
     .select({
       id: tasks.id,
@@ -82,15 +103,14 @@ const getBaseTaskQuery = () => {
       dueDate: tasks.dueDate,
       createdAt: tasks.createdAt,
       updatedAt: tasks.updatedAt,
-      assigneeId: tasks.assigneeId,
       assignerId: tasks.assignerId,
-      assigneeName: tasks.assigneeName,
-      assignerName: tasks.assignerName,
+      assignerName: assigner.name,
+      assignees: tasks.assignees,
     })
     .from(tasks)
-    .leftJoin(assignee, eq(assignee.id, tasks.assigneeId))
     .leftJoin(assigner, eq(assigner.id, tasks.assignerId));
 };
+
 
 export class TaskRepository {
   static async findAll() {
@@ -103,8 +123,15 @@ export class TaskRepository {
 
   static async findByAssignee(assigneeId: number) {
     return getBaseTaskQuery()
-      .where(eq(tasks.assigneeId, assigneeId))
+      .where(
+        sql`EXISTS (
+            SELECT 1 FROM jsonb_array_elements(${tasks.assignees}) AS assignee
+            WHERE (assignee->>'userId')::int = ${assigneeId}
+          )`
+      )
       .orderBy(sql`${tasks.createdAt} DESC`);
+    // .where(eq((tasks.assignees as Assignee[]), assigneeId))
+    // .orderBy(sql`${tasks.createdAt} DESC`);
   }
 
   static async findByAssigner(assignerId: number) {
@@ -202,7 +229,7 @@ export class TaskRepository {
     }
 
     if (filters?.assigneeId) {
-      whereConditions.push(eq(tasks.assigneeId, filters.assigneeId));
+      whereConditions.push(eq((tasks.assignees as any).id, filters.assigneeId));
     }
 
     if (filters?.assignerId) {

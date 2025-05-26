@@ -17,14 +17,15 @@ import { format } from "date-fns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function SettingsPage() {
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
+  if (!user) return null // Ensure user is loaded before rendering
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
 
   const [profileForm, setProfileForm] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    position: user?.position || "",
+    position: user?.position || "" as 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members',
   })
 
   const [notificationSettings, setNotificationSettings] = useState({
@@ -34,10 +35,11 @@ export default function SettingsPage() {
     taskCompleted: true,
   })
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setProfileForm((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const { name, value } = e.target
+  setProfileForm((prev) => ({ ...prev, [name]: value }))
+}
+
 
   const handleNotificationChange = (key: string) => {
     setNotificationSettings((prev) => ({
@@ -52,7 +54,12 @@ export default function SettingsPage() {
     try {
       setLoading(true)
       // Simulate update
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await updateUser({
+        ...user,
+        name: profileForm.name,
+        position: profileForm.position,
+      })
+      // await new Promise((resolve) => setTimeout(resolve, 1000))
 
       toast({
         title: "Profile updated",
@@ -136,14 +143,14 @@ export default function SettingsPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <Label htmlFor="role">Role</Label>
                     <Input
                       id="role"
                       value={user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       disabled
                     />
-                  </div>
+                  </div> */}
                   <div className="space-y-2">
                     <Label htmlFor="lastNotificationReadAt">Last Notification Read</Label>
                     <Input

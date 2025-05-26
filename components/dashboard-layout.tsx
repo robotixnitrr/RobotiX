@@ -34,7 +34,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth()
+  const { user, logout, updateUser } = useAuth()
   const pathname = usePathname()
   const [notifications, setNotifications] = useState<any[]>([])
   const [isMounted, setIsMounted] = useState(false)
@@ -77,7 +77,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return null
   }
 
-  const isAssigner = user.role === "assigner"
+  const canAssignTasks = ["overall-cordinator", "head-coordinator", "core-coordinator"].includes(user.position || "");
   const userInitials = user.name
     .split(" ")
     .map((n) => n[0])
@@ -146,7 +146,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {isAssigner && (
+              {canAssignTasks && (
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
@@ -188,7 +188,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <span className="text-sm font-medium">{user.name}</span>
                   <span className="text-xs text-muted-foreground capitalize flex items-center gap-1">
                     <Zap className="h-3 w-3" />
-                    {user.role}
+                    {user.position}
                   </span>
                 </div>
               </div>
@@ -218,8 +218,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <DropdownMenu
                   onOpenChange={(open) => {
                     if (open) {
-                      console.log("user", user.id)
                       markNotificationsAsRead(user.id)
+                      updateUser({
+                        ...user,
+                        lastNotificationReadAt: new Date()
+                      })
                     }
                   }}>
                   <DropdownMenuTrigger asChild>
@@ -255,7 +258,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </div>
                     ) : notifications.length === 0 ? (
                       <div className="p-4 text-center text-sm text-muted-foreground">
-                        No notifications yet
+                        No new notifications yet
                       </div>
                     ) : (
                       notifications.slice(0, 5).map((notification) => (

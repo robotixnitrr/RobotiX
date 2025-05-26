@@ -180,12 +180,19 @@ export default function CreateTaskPage() {
     }))
   }, [isFormValid])
 
+  useEffect(() => {
+    if (!user) {
+      router.push('/')
+      return
+    }
+  })
+
   // Load assignees
   useEffect(() => {
     async function loadAssignees() {
       try {
         setAssigneesLoading(true)
-        const fetchedAssignees = await getAssignees()
+        const fetchedAssignees = await getAssignees(user?.id || 0)
         setAssignees(fetchedAssignees)
       } catch (error) {
         console.error("Failed to load assignees:", error)
@@ -284,8 +291,13 @@ export default function CreateTaskPage() {
         dueDate: formState.data.dueDate,
         assignerId: Number(user.id),
         assignerName: user.name,
-        assigneeId: Number(formState.data.assigneeId),
-        assigneeName: selectedAssignee.name,
+        assignee:
+        {
+          id: Number(selectedAssignee.id),
+          name: selectedAssignee.name,
+          assignedAt: new Date(),
+        }
+
       }
 
       console.log("Submitting task data:", taskData)
@@ -299,15 +311,15 @@ export default function CreateTaskPage() {
       router.push("/dashboard/tasks")
     } catch (error) {
       console.error("Task creation error:", error)
-      
+
       // More detailed error logging
       if (error instanceof Error) {
         console.error("Error message:", error.message)
         console.error("Error stack:", error.stack)
       }
-      
+
       toast({
-        variant: "destructive", 
+        variant: "destructive",
         title: "Failed to create task",
         description: error instanceof Error ? error.message : "There was an error creating your task. Please try again.",
       })
@@ -326,9 +338,8 @@ export default function CreateTaskPage() {
       </div>
     )
   }
-
   // Authorization check
-  if (!user || user.role !== "assigner") {
+  if (!user || user.position && user.position == "members") {
     return (
       <DashboardLayout>
         <Card className="max-w-3xl mx-auto">

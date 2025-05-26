@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
         id: users.id,
         name: users.name,
         email: users.email,
-        role: users.role,
         position: users.position,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,

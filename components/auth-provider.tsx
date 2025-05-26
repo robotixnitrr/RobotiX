@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import type { User } from "@/db/schema"
+import Loading from "@/app/dashboard/tasks/loading"
 
 type AuthContextType = {
   user: User | null
@@ -12,6 +13,7 @@ type AuthContextType = {
   register: (name: string, email: string, password: string, role: "assigner" | "assignee", position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'
   ) => Promise<void>
   logout: () => void
+  updateUser: (a: User) => void
   isLoading: boolean
 }
 
@@ -52,17 +54,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Protect routes
   useEffect(() => {
-    if (!isLoading && isInitialized) {
-      const publicRoutes = ["/", "/login", "/register"]
-      const isPublicRoute = publicRoutes.includes(pathname)
+    if (!isInitialized) return
 
-      if (!user && !isPublicRoute) {
-        router.push("/login")
-      } else if (user && (pathname === "/login" || pathname === "/register")) {
-        router.push("/dashboard")
-      }
+    const publicRoutes = ["/", "/login", "/register"]
+    const isPublicRoute = publicRoutes.includes(pathname)
+
+    if (!user && !isPublicRoute) {
+      router.push("/login")
+    } else if (user && isPublicRoute) {
+      router.push("/dashboard")
     }
-  }, [user, pathname, isLoading, isInitialized, router])
+  }, [user, pathname, isInitialized])
+
+  if (!isInitialized) {
+    return <Loading /> // or null or a spinner
+  }
 
   const login = async (email: string, password: string) => {
     try {
@@ -178,7 +184,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  return <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>{children}</AuthContext.Provider>
+  const updateUser = async (updatedUser: User) => {
+    setUser(updatedUser)
+    const response = await fetch("/api/user/update", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedUser),
+    })
+    if (!response.ok) {
+      const errorText = await response.text()
+      let errorMessage = "Failed to update user"
+      try {
+        const errorData = JSON.parse(errorText)
+        errorMessage = errorData.error || errorMessage
+      } catch {
+        // If response is not JSON, use the text as error message
+        errorMessage = errorText.includes("<!DOCTYPE") ? "Server error - please try again" : errorText
+      }
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+    }
+  }
+  return <AuthContext.Provider value={{ user, login, register, logout, updateUser, isLoading }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
