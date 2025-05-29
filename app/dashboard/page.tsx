@@ -12,8 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { getTasks, getTaskStats } from "@/lib/actions"
 import type { TaskWithTypedAssignees } from "@/db/schema"
-import { ArrowRight, CheckCircle2, Clock, ClipboardList, Loader2, PlusCircle } from "lucide-react"
+import { ArrowRight, CheckCircle2, Clock, ClipboardList, Loader2, PlusCircle, GripVertical } from "lucide-react"
 import DashboardLayout from "@/components/dashboard-layout"
+import { useRouter } from "next/navigation"
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -64,12 +65,12 @@ export default function DashboardPage() {
 
   // Determine if user can create tasks (you may need to adjust this logic based on your business rules)
   // Since role is removed, you might use position or another field to determine permissions
-  const canCreateTasks = user.position === "overall-cordinator" || user.position === "head-coordinator"
+  const canCreateTasks = !(user.position === "members")
 
   // Filter tasks for the current user
   // Tasks assigned by the user
   const assignedByUser = tasks.filter((task) => task.assignerId === Number(user.id))
-  
+
   // Tasks assigned to the user (current assignee)
   const assignedToUser = tasks.filter((task) => {
     const currentAssignee = task.assignees[task.assignees.length - 1] // Get the latest assignee
@@ -77,27 +78,41 @@ export default function DashboardPage() {
   })
 
   // All tasks related to the user (either assigned by them or assigned to them)
-  const userTasks = [...assignedByUser, ...assignedToUser].filter((task, index, arr) => 
+  const userTasks = [...assignedByUser, ...assignedToUser].filter((task, index, arr) =>
     arr.findIndex(t => t.id === task.id) === index // Remove duplicates
   )
 
   const pendingTasks = tasks.filter((task) => task.status === "pending")
   const inProgressTasks = tasks.filter((task) => task.status === "in-progress")
   const completedTasks = tasks.filter((task) => task.status === "completed")
-
+  const router = useRouter()
   return (
     <DashboardLayout>
       <div className="space-y-6 w-full">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-bold tracking-tight">Welcome back, {user.name}</h2>
-          {canCreateTasks && (
-            <Link href="/dashboard/create-task">
-              <Button className="gap-2 whitespace-nowrap">
-                <PlusCircle className="h-4 w-4" />
-                Create Task
-              </Button>
-            </Link>
-          )}
+          <div className="flex gap-5">
+
+            <Button onClick={() => {
+              router.push('/dashboard/tasks/chart')
+            }}
+              variant="secondary"
+              className="flex justify-center items-center"
+            >
+              <GripVertical />
+              <p className="">Flow Chart</p>
+            </Button>
+            {canCreateTasks && (
+              <>
+                <Link href="/dashboard/create-task">
+                  <Button className="gap-2 whitespace-nowrap">
+                    <PlusCircle className="h-4 w-4" />
+                    Create Task
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
