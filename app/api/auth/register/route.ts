@@ -6,17 +6,25 @@ import { eq } from "drizzle-orm";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, role, position } = body;
+    const { name, email, password, position } = body;
 
     // Validate input
-    if (!name || !email || !password || !role || !position) {
+    if (!name || !email || !password || !position) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
-
-    if (!["assigner", "assignee"].includes(role)) {
-      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
+      return NextResponse.json({ error: "Invalid input types" }, { status: 400 });
     }
-
+    if (name.length < 3 || name.length > 50) {
+      return NextResponse.json({ error: "Name must be between 3 and 50 characters" }, { status: 400 });
+    }
+    if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+    }
+    if (password.length < 6 || password.length > 100) {
+      return NextResponse.json({ error: "Password must be between 6 and 100 characters"
+      }, { status: 400 });
+    }
     const validPositions = [
       "overall-cordinator",
       "head-coordinator",

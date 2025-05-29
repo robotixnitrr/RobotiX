@@ -1,6 +1,6 @@
 import { db } from "@/db"
 import { CreateTaskInput, CreateUserInput, tasks, UpdateTaskInput, users } from "@/db/schema"
-import { eq, and, sql, ilike, inArray, or } from "drizzle-orm"
+import { eq, and, sql, ilike, inArray, or, not } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 import { Assignee } from "./types"
 import { positionRank } from "./constants"
@@ -56,11 +56,13 @@ export class UserRepository {
       .from(users)
       .where(
         and(
-          inArray(users.position, allowedPositions as readonly Position[])
+          inArray(users.position, allowedPositions as readonly Position[]), // Allowed positions
+          not(eq(users.id, currentUserId)) // Exclude current user
         )
       )
       .orderBy(users.name);
   }
+
 
 
   static async findAll() {

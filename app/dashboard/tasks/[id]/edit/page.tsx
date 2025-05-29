@@ -190,7 +190,7 @@ export default function EditTaskPage() {
     <DashboardLayout>
       <div className="space-y-6 w-full">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Edit Task</h2>
+          {/* <h2 className="text-2xl font-bold">Edit Task</h2> */}
           <Button variant="outline" size="sm" asChild>
             <Link href={`/dashboard/tasks/${taskId}`}>
               <ArrowLeft className="mr-2 h-4 w-4" />Back
@@ -282,7 +282,7 @@ export default function EditTaskPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plus className="h-5 w-5" />
-                  Add Assignee
+                  {task.assignees.length > 0 ? "Reassign Assignee" : "Assign Assignee"}
                 </CardTitle>
                 <CardDescription>Reassign or add additional assignees to this task</CardDescription>
               </CardHeader>

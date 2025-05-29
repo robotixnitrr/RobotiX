@@ -15,6 +15,26 @@ function safeParseDate(value: Date | string | null): Date {
 }
 
 // Task actions
+export async function getTasksByUserId(id : number): Promise<TaskWithTypedAssignees[]> {
+  try {
+    let rawTasks: any[] = [];
+
+    rawTasks = await TaskRepository.findByAssigner(id);
+    // Safely type-cast assignees after query
+    const typedTasks: TaskWithTypedAssignees[] = rawTasks.map(task => ({
+      ...task,
+      assignees: task.assignees as Assignee[],
+    }));
+
+    return typedTasks;
+  } catch (error) {
+    console.error("Error in getTasks:", error);
+    throw new Error(
+      `Failed to get tasks: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
+}
+
 export async function getTasks(filters?: {
   assigneeId?: number
   assignerId?: number

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth-provider"
 import DashboardLayout from "@/components/dashboard-layout"
 import { PriorityBadge } from "@/components/priority-badge"
@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { getTasks, getAssignees } from "@/lib/actions"
 import type { TaskWithTypedAssignees, User } from "@/db/schema"
-import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search, AlertCircle, History, User as UserIcon } from "lucide-react"
+import { ClipboardList, Loader2, MoreHorizontal, PlusCircle, Search, AlertCircle, History, User as UserIcon, GripVertical } from "lucide-react"
 
 export default function TasksPage() {
   const { user } = useAuth()
@@ -44,6 +44,7 @@ export default function TasksPage() {
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [assigneeFilter, setAssigneeFilter] = useState("all")
   const [assignerFilter, setAssignerFilter] = useState("all")
+  const router = useRouter()
 
   useEffect(() => {
     async function loadData() {
@@ -73,7 +74,7 @@ export default function TasksPage() {
 
         // Dismiss loading toast and show success
         loadingToast.dismiss?.()
-        
+
         toast({
           title: "Tasks loaded successfully",
           description: `Found ${fetchedTasks.length} task${fetchedTasks.length !== 1 ? 's' : ''}`,
@@ -83,7 +84,7 @@ export default function TasksPage() {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred"
         console.error("Failed to load tasks:", error)
         setError(errorMessage)
-        
+
         toast({
           variant: "destructive",
           title: "Failed to load tasks",
@@ -131,7 +132,7 @@ export default function TasksPage() {
 
     // Apply assignee filter
     if (assigneeFilter !== "all") {
-      result = result.filter((task) => 
+      result = result.filter((task) =>
         task.assignees.some(assignee => assignee.id === Number(assigneeFilter))
       )
     }
@@ -172,7 +173,7 @@ export default function TasksPage() {
     setPriorityFilter("all")
     setAssigneeFilter("all")
     setAssignerFilter("all")
-    
+
     toast({
       title: "Filters reset",
       description: "All filters have been cleared.",
@@ -226,8 +227,8 @@ export default function TasksPage() {
       <AlertCircle className="h-10 w-10 text-destructive" />
       <h3 className="mt-4 text-lg font-semibold">Failed to load tasks</h3>
       <p className="mt-2 text-sm text-muted-foreground">{error}</p>
-      <Button 
-        className="mt-4" 
+      <Button
+        className="mt-4"
         onClick={() => window.location.reload()}
         variant="outline"
       >
@@ -267,12 +268,24 @@ export default function TasksPage() {
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <h2 className="text-2xl font-bold tracking-tight">Tasks</h2>
           {canCreateTasks && (
-            <Link href="/dashboard/create-task">
-              <Button className="gap-2 whitespace-nowrap">
-                <PlusCircle className="h-4 w-4" />
-                Create Task
+            <div className="flex gap-10">
+              <Button onClick={() => {
+                router.push('tasks/chart')
+              }}
+                variant="secondary"
+                className="flex justify-center items-center"
+              >
+                <GripVertical />
+                <p className="">Flow Chart</p>
               </Button>
-            </Link>
+              <Link href="/dashboard/create-task">
+                <Button className="gap-2 whitespace-nowrap">
+                  <PlusCircle className="h-4 w-4" />
+                  Create Task
+                </Button>
+              </Link>
+
+            </div>
           )}
         </div>
 
@@ -303,8 +316,8 @@ export default function TasksPage() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-                <Select 
-                  value={statusFilter} 
+                <Select
+                  value={statusFilter}
                   onValueChange={setStatusFilter}
                   disabled={tasksLoading}
                 >
@@ -319,8 +332,8 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select 
-                  value={priorityFilter} 
+                <Select
+                  value={priorityFilter}
                   onValueChange={setPriorityFilter}
                   disabled={tasksLoading}
                 >
@@ -335,8 +348,8 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select 
-                  value={assigneeFilter} 
+                <Select
+                  value={assigneeFilter}
                   onValueChange={setAssigneeFilter}
                   disabled={assigneesLoading}
                 >
@@ -354,8 +367,8 @@ export default function TasksPage() {
                   </SelectContent>
                 </Select>
 
-                <Select 
-                  value={assignerFilter} 
+                <Select
+                  value={assignerFilter}
                   onValueChange={setAssignerFilter}
                   disabled={tasksLoading}
                 >
@@ -379,10 +392,10 @@ export default function TasksPage() {
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   <span className="text-muted-foreground">
-                    {tasksLoading && assigneesLoading 
-                      ? "Loading tasks and assignees..." 
-                      : tasksLoading 
-                        ? "Loading tasks..." 
+                    {tasksLoading && assigneesLoading
+                      ? "Loading tasks and assignees..."
+                      : tasksLoading
+                        ? "Loading tasks..."
                         : "Loading assignees..."}
                   </span>
                 </div>
@@ -498,10 +511,10 @@ export default function TasksPage() {
                 <h3 className="mt-4 text-lg font-semibold">No tasks found</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {searchQuery ||
-                  statusFilter !== "all" ||
-                  priorityFilter !== "all" ||
-                  assigneeFilter !== "all" ||
-                  assignerFilter !== "all"
+                    statusFilter !== "all" ||
+                    priorityFilter !== "all" ||
+                    assigneeFilter !== "all" ||
+                    assignerFilter !== "all"
                     ? "Try adjusting your filters to find what you're looking for."
                     : canCreateTasks
                       ? "You haven't assigned any tasks yet. Create your first task to get started."

@@ -356,7 +356,7 @@ export default function CreateTaskPage() {
     <DashboardLayout>
       <div className="space-y-6 w-full">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Create Task</h2>
+          {/* <h2 className="text-2xl font-bold tracking-tight">Create Task</h2> */}
           <p className="text-muted-foreground">Fill in the details below to create a new task.</p>
         </div>
 

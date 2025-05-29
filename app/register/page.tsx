@@ -18,7 +18,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [role, setRole] = useState<"assigner" | "assignee">("assignee")
+  // const [role, setRole] = useState<"assigner" | "assignee">("assignee")
   const [position, setPosition] = useState<'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'>("members")
   const { register, isLoading } = useAuth()
 
@@ -29,7 +29,7 @@ export default function RegisterPage() {
       return // Handle password mismatch
     }
 
-    await register(name, email, password, role, position)
+    await register(name, email, password, position)
   }
 
   return (
@@ -100,7 +100,7 @@ export default function RegisterPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label>Account Type</Label>
               <RadioGroup
                 defaultValue="assignee"
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                   </Label>
                 </div>
               </RadioGroup>
-            </div>
+            </div> */}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={isLoading || password !== confirmPassword}>

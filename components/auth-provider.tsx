@@ -10,7 +10,7 @@ import Loading from "@/app/dashboard/tasks/loading"
 type AuthContextType = {
   user: User | null
   login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string, role: "assigner" | "assignee", position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'
+  register: (name: string, email: string, password: string, position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members'
   ) => Promise<void>
   logout: () => void
   updateUser: (a: User) => void
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const register = async (name: string, email: string, password: string, role: "assigner" | "assignee", position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members') => {
+  const register = async (name: string, email: string, password: string, position: 'overall-cordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members') => {
     try {
       setIsLoading(true)
 
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password, role, position }),
+        body: JSON.stringify({ name, email, password, position }),
       })
 
       if (!response.ok) {

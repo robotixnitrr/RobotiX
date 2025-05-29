@@ -25,7 +25,7 @@ export default function Home() {
               {/* <CheckCircle className="h-6 w-6 text-white" /> */}
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              RobotiX TaskFlow
+              ROBOTiX TaskFlow
             </span>
           </div>
           <nav className="flex items-center gap-4">
@@ -57,7 +57,7 @@ export default function Home() {
           <div className="container relative space-y-6 py-12 md:py-24 lg:py-32">
             <div className="mx-auto flex max-w-[64rem] flex-col items-center space-y-6 text-center">
               <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:text-6xl lg:leading-[1.1] animate-fade-in">
-                Streamline RobotiX team&apos;s workflow with{" "}
+                Streamline ROBOTiX team&apos;s workflow with{" "}
                 <span className="bg-gradient-to-r from-primary via-brand-500 to-brand-600 bg-clip-text text-transparent">
                   TaskFlow
                 </span>
