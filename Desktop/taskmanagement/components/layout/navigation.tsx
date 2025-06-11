@@ -115,7 +115,8 @@ export function Navigation() {
                 <div className="absolute inset-0.5 rounded-[10px] bg-gradient-to-br from-primary-foreground/20 to-transparent" /> */}
                 <span className="relative group-hover:scale-110 transition-transform duration-300">
                   {/* R */}
-                <img src="./logoBlack.png" alt="" />
+                <img src="./logoBlack.png" alt="" className="dark:hidden"/>
+                <img src="./logoWhite.png" alt="" className="hidden dark:block"/>
                 </span>
                 {/* <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary/60 animate-pulse" /> */}
               </div>
