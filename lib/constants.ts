@@ -69,8 +69,8 @@ export const TASK_PRIORITIES = [
 ] as const
 
 export const APP_CONFIG = {
-  name: "RobotiX TaskFlow",
-  description: "A modern task management application for teams",
+  name: "ROBOTiX",
+  description: "ROBOTiX Club",
   version: "1.0.0",
   author: "RobotiX Club",
 } as const
