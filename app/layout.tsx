@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { AuthProvider } from "@/components/providers/auth-provider"
 import { Toaster } from "@/components/ui/toaster"
+import { Toaster as Sonner } from "@/components/ui/sonner"
 import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { APP_CONFIG } from "@/lib/constants"
 import "./globals.css"
@@ -16,7 +17,7 @@ export const metadata = {
     icon: "/logoWhite.png",
     shortcut: "/favicon.ico",
   },
-    generator: 'v0.dev'
+  generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -31,6 +32,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <AuthProvider>
               {children}
+              <Sonner />
               <Toaster />
             </AuthProvider>
           </ThemeProvider>

@@ -5,12 +5,15 @@ import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
     const body = await request.json();
-    const { id, name, email, position, lastNotificationReadAt } = body;
+    const { id, name, email, position, lastNotificationReadAt, avatarUrl, githubUrl, linkedinUrl } = body;
     const user = await db.select({
         id: users.id,
         name: users.name,
         email: users.email,
         position: users.position,
+        avatarUrl: users.avatarUrl,
+        githubUrl: users.githubUrl,
+        linkedinUrl: users.linkedinUrl,
         lastNotificationReadAt: users.lastNotificationReadAt,
     }).from(users)
         .where(eq(users.id, id))
@@ -41,14 +44,27 @@ export async function POST(request: NextRequest) {
     if (position) {
         updatedUser.position = position;
     }
+    if (avatarUrl) {
+        updatedUser.avatarUrl = avatarUrl;
+    }
+    if (githubUrl) {
+        updatedUser.githubUrl = githubUrl;
+    }
+    if (linkedinUrl) {
+        updatedUser.linkedinUrl = linkedinUrl;
+    }
     if (lastNotificationReadAt) {
         updatedUser.lastNotificationReadAt = new Date(lastNotificationReadAt);
     }
+    
     const userUpdate = await db.update(users)
         .set({
             name: updatedUser.name,
             email: updatedUser.email,
             position: updatedUser.position,
+            avatarUrl: updatedUser.avatarUrl,
+            githubUrl: updatedUser.githubUrl,
+            linkedinUrl: updatedUser.linkedinUrl,
             lastNotificationReadAt: updatedUser.lastNotificationReadAt,
         })
         .where(eq(users.id, id))
@@ -57,6 +73,9 @@ export async function POST(request: NextRequest) {
             name: users.name,
             email: users.email,
             position: users.position,
+            avatarUrl: users.avatarUrl,
+            githubUrl: users.githubUrl,
+            linkedinUrl: users.linkedinUrl,
             lastNotificationReadAt: users.lastNotificationReadAt,
         });
     if (userUpdate.length === 0) {

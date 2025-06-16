@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import AvatarUploader from "@/components/user/avatar-uploader"
 
 export default function SettingsPage() {
   const { user, updateUser } = useAuth()
@@ -26,6 +27,7 @@ export default function SettingsPage() {
     name: user?.name || "",
     email: user?.email || "",
     position: user?.position || "" as 'overall-coordinator' | 'head-coordinator' | 'core-coordinator' | 'executive' | 'members',
+    avatarUrl: user?.avatarUrl || "",
   })
 
   const [notificationSettings, setNotificationSettings] = useState({
@@ -36,9 +38,13 @@ export default function SettingsPage() {
   })
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-  const { name, value } = e.target
-  setProfileForm((prev) => ({ ...prev, [name]: value }))
-}
+    const { name, value } = e.target
+    setProfileForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleAvatarUpload = (url: string) => {
+    setProfileForm((prev) => ({ ...prev, avatarUrl: url }))
+  }
 
 
   const handleNotificationChange = (key: string) => {
@@ -58,6 +64,7 @@ export default function SettingsPage() {
         ...user,
         name: profileForm.name,
         position: profileForm.position,
+        avatarUrl: profileForm.avatarUrl,
       })
       // await new Promise((resolve) => setTimeout(resolve, 1000))
 
@@ -119,6 +126,14 @@ export default function SettingsPage() {
                   <CardDescription>Update your personal information.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="avatar">Profile Picture</Label>
+                    <AvatarUploader
+                      currentAvatar={profileForm.avatarUrl}
+                      onUpload={handleAvatarUpload}
+                      className="max-w-md"
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input id="name" name="name" value={profileForm.name} onChange={handleProfileChange} />

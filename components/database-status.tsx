@@ -91,9 +91,9 @@ export function DatabaseStatus() {
 
         <div className="space-y-2">
           <p className="text-xs text-muted-foreground">
-            Your data is stored in Neon PostgreSQL and is accessible from anywhere on the internet.
+            Your data is stored in Neon PostgreSQL and is accessible from anywhere on the internet with a secure url available to only ROBOTiX Club higher official.
           </p>
-          <div className="grid grid-cols-2 gap-2 text-xs">
+          {/* <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="space-y-1">
               <p className="font-medium">Demo Assigner:</p>
               <p className="text-muted-foreground">assigner@example.com</p>
@@ -103,7 +103,7 @@ export function DatabaseStatus() {
               <p className="text-muted-foreground">assignee@example.com</p>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">Password: password</p>
+          <p className="text-xs text-muted-foreground">Password: password</p> */}
         </div>
       </CardContent>
     </Card>

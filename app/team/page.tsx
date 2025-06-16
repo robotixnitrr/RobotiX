@@ -46,11 +46,13 @@ export default function TeamPage() {
       setError(null)
       const response = await fetch("/api/team")
 
+
       if (!response.ok) {
         throw new Error("Failed to fetch team members")
       }
 
       const data = await response.json()
+      console.log(data)
       setMembers(data.members)
     } catch (error) {
       console.error("Failed to fetch team members:", error)
@@ -130,7 +132,7 @@ export default function TeamPage() {
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
         <Navigation />
 
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-12 pt-20">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>

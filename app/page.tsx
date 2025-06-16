@@ -13,13 +13,15 @@ export default function HomePage() {
       <div className="nav h-[5rem]">
         <Navigation />
       </div>
-      <HeroSection />
-      <AboutSection />
-      <FeaturedProjectsSection />
-      <TeamHighlightsSection />
-      <AlumniSection />
-      <ContactSection />
-      <Footer />
+      <div className="">
+        <HeroSection />
+        <AboutSection />
+        <FeaturedProjectsSection />
+        <TeamHighlightsSection />
+        <AlumniSection />
+        <ContactSection />
+        <Footer />
+      </div>
     </div>
   )
 }
