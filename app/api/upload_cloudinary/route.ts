@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { CloudinaryService } from '@/lib/upload_cloudinary';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
+import { ensureTempDirectory } from '@/lib/utils/temp-directory';
+
+if (process.env.NODE_ENV !== 'production') {
+  ensureTempDirectory();
+}
 
 export async function POST(req: Request) {
   try {
