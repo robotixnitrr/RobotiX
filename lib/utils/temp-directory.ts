@@ -1,7 +1,9 @@
 import { mkdir } from 'fs/promises';
 import { join } from 'path';
+import { tmpdir } from 'os';
 
-export const TEMP_DIR = join(process.cwd(), 'tmp');
+export const TEMP_DIR = tmpdir(); // e.g., /tmp on Unix, C:\Users\<user>\AppData\Local\Temp on Windows
+
 
 export async function ensureTempDirectory() {
   try {

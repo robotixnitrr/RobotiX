@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 import { CloudinaryService } from '@/lib/upload_cloudinary';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import { TEMP_DIR, ensureTempDirectory } from '@/lib/utils/temp-directory';
+import { TEMP_DIR } from '@/lib/utils/temp-directory';
 
 export async function POST(req: Request) {
   try {
-      await ensureTempDirectory();
     const formData = await req.formData();
     const file = formData.get('file') as File;
     
