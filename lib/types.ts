@@ -19,5 +19,7 @@ export interface AlumniInterface {
   github: string,
   featured: Boolean,
   company: string,
-  location: string
+  location: string,
+  graduationYear?: number,
+  testimonial?: string,
 }
