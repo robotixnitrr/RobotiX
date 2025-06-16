@@ -2,11 +2,7 @@ import { NextResponse } from 'next/server';
 import { CloudinaryService } from '@/lib/upload_cloudinary';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
-import { ensureTempDirectory } from '@/lib/utils/temp-directory';
-
-if (process.env.NODE_ENV !== 'production') {
-  ensureTempDirectory();
-}
+import { TEMP_DIR } from '@/lib/utils/temp-directory';
 
 export async function POST(req: Request) {
   try {
@@ -20,18 +16,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Create a temporary file
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     
-    // Create temporary file path
-    const tempDir = join(process.cwd(), 'tmp');
-    const tempPath = join(tempDir, file.name);
+    // Use the TEMP_DIR constant
+    const tempPath = join(TEMP_DIR, `${Date.now()}-${file.name}`);
     
-    // Ensure tmp directory exists and write file
     await writeFile(tempPath, buffer);
 
-    // Upload to Cloudinary
     const result = await CloudinaryService.uploadFile(tempPath, {
       folder: 'avatars',
       width: 300,
