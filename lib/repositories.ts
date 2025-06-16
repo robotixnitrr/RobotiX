@@ -29,6 +29,17 @@ export class UserRepository {
     return result
   }
 
+  static async featuredTeam() {
+    const result = await db.query.users.findMany({
+      where: and(
+        eq(users.position, 'overall-coordinator'),
+      ),
+      orderBy: desc(users.createdAt),
+      limit: 3
+    })
+    return result
+  }
+
   static async findById(id: number) {
     const result = await db.query.users.findFirst({
       where: eq(users.id, id),

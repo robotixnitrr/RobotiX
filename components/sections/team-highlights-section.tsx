@@ -18,7 +18,7 @@ export function TeamHighlightsSection() {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const response = await fetch("/api/team")
+        const response = await fetch("/api/team/featured")
         if (response.ok) {
           const data = await response.json()
           // Show only coordinators and executives as highlights
