@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Shield } from "lucide-react"
 import Link from "next/link"
 import { ROUTES } from "@/lib/constants"
+import { LoadingSpinner } from "./loading-spinner"
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -22,9 +23,7 @@ export function ProtectedRoute({ children, requireAuth = true, checkPermission, 
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <LoadingSpinner />
     )
   }
 

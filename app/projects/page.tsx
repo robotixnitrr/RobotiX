@@ -159,7 +159,7 @@ export default function ProjectsPage() {
             </div>
 
             {user &&
-              <Link href="/dashboard/create-project">
+              <Link href="/dashboard/projects/create">
                 <Button size="lg" className="mt-4 md:mt-0">
                   <Plus className="h-5 w-5 mr-2" />
                   Add Project

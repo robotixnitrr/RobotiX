@@ -136,23 +136,26 @@ export default function TeamPage() {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              <p className="text-4xl md:text-5xl font-bold pb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 Our Amazing Team
-              </h1>
+              </p>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                of {members.length}
+              </h3>
               <p className="text-xl text-muted-foreground max-w-3xl">
                 Meet the passionate individuals who drive innovation and excellence at RobotiX Club. Our diverse team
                 brings together expertise in robotics, AI, IoT, and cutting-edge technology.
               </p>
             </div>
 
-            <ProtectedRoute requireAuth={false} checkPermission={() => canManageTeam} fallback={null}>
+            {/* <ProtectedRoute requireAuth={false} checkPermission={() => canManageTeam} fallback={null}>
               <Link href="/dashboard/team/add">
                 <Button size="lg" className="mt-4 md:mt-0">
                   <Plus className="h-5 w-5 mr-2" />
                   Add Member
                 </Button>
               </Link>
-            </ProtectedRoute>
+            </ProtectedRoute> */}
           </div>
 
           {/* Filters */}
@@ -186,8 +189,8 @@ export default function TeamPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
             <Card className="text-center">
               <CardContent className="pt-6">
-                <div className="text-2xl font-bold text-primary">{members.length}</div>
-                <p className="text-sm text-muted-foreground">Total Members</p>
+                <div className="text-2xl font-bold text-primary">{members.filter((m) => m.position == "head-coordinator").length}</div>
+                <p className="text-sm text-muted-foreground">Head Coordinators</p>
               </CardContent>
             </Card>
             <Card className="text-center">
@@ -195,7 +198,7 @@ export default function TeamPage() {
                 <div className="text-2xl font-bold text-primary">
                   {members.filter((m) => m.position?.includes("coordinator")).length}
                 </div>
-                <p className="text-sm text-muted-foreground">Coordinators</p>
+                <p className="text-sm text-muted-foreground">Core Coordinators</p>
               </CardContent>
             </Card>
             <Card className="text-center">
