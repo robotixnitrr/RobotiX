@@ -14,12 +14,12 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (isNaN(projectId) || isNaN(milestoneId)) {
       return NextResponse.json({ success: false, error: "Invalid ID" }, { status: 400 })
     }
-    const userCookie = request.cookies.get("user")?.value;
-    const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
+    // const userCookie = request.cookies.get("user")?.value;
+    // const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
 
-    if (!user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+    // if (!user) {
+    //   return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    // }
 
     // const session = await getServerSession()
     // if (!session?.user) {
@@ -51,15 +51,17 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string; milestoneId: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string; milestoneId: string }> }) {
   try {
-    const projectId = Number.parseInt(params.id)
-    const milestoneId = Number.parseInt(params.milestoneId)
+    const params = await context.params;
+    const projectId = Number.parseInt(params.id);
+    const milestoneId = Number.parseInt(params.milestoneId);
 
     if (isNaN(projectId) || isNaN(milestoneId)) {
       return NextResponse.json({ success: false, error: "Invalid ID" }, { status: 400 })
     }
     const userCookie = request.cookies.get("user")?.value;
+    console.log(userCookie)
     const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
 
     if (!user) {
@@ -139,8 +141,9 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string; milestoneId: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string; milestoneId: string }> }) {
   try {
+    const params = await context.params;
     const projectId = Number.parseInt(params.id)
     const milestoneId = Number.parseInt(params.milestoneId)
 

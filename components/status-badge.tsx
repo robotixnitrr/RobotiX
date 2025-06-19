@@ -12,7 +12,7 @@ export function StatusBadge({ status, size = "default" }: StatusBadgeProps) {
     .join(" ")
 
   return (
-    <Badge variant={status} size={size}>
+    <Badge variant={status == "in-progress" ? "default" : status === "pending" ? "destructive" : "outline"}>
       {statusLabel}
     </Badge>
   )

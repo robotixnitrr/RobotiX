@@ -16,6 +16,7 @@ export async function GET(request: NextRequest, context: RouteParams) {
     // Await params to access id
     const { id } = await context.params;
     const projectId = Number.parseInt(id);
+    console.log(projectId)
 
     if (isNaN(projectId)) {
       return NextResponse.json(
@@ -25,15 +26,15 @@ export async function GET(request: NextRequest, context: RouteParams) {
     }
 
     // Get user from cookie
-    const userCookie = request.cookies.get("user")?.value;
-    const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
+    // const userCookie = request.cookies.get("user")?.value;
+    // const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    // if (!user) {
+    //   return NextResponse.json(
+    //     { success: false, error: "Unauthorized" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // Check if project exists
     const project = await ProjectRepository.findById(projectId);
@@ -81,15 +82,18 @@ export async function POST(request: NextRequest, context: RouteParams) {
     }
 
     // Get user from cookie
-    const userCookie = request.cookies.get("user")?.value;
-    const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
+    const data = await request.json()
+    const user = JSON.parse(data.user)
+    console.log(data, user)
+    // const userCookie = request.cookies.get("user")?.value;
+    // const user = userCookie ? JSON.parse(decodeURIComponent(userCookie)) : null;
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    // if (!user) {
+    //   return NextResponse.json(
+    //     { success: false, error: "Unauthorized" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // Check if project exists
     const project = await ProjectRepository.findById(projectId);
@@ -113,11 +117,10 @@ export async function POST(request: NextRequest, context: RouteParams) {
       );
     }
 
-    const body = await request.json();
 
     // Validate milestone data
     const validationResult = milestoneSchema.safeParse({
-      ...body,
+      ...data.data,
       projectId,
     });
 

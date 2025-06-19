@@ -304,7 +304,7 @@ export interface TaskWithTypedAssignees extends Omit<Task, "assignees"> {
 
 // Validation schemas
 export const projectStatusEnum = ["planning", "in-progress", "completed", "on-hold"] as const
-export const projectCategoryEnum = ["robotics", "ai-ml", "iot", "automation", "research", "competition"] as const
+export const projectCategoryEnum = ["robotics", "ai-ml", "iot", "automation", "research", "competition", "web"] as const
 export const projectPriorityEnum = ["low", "medium", "high"] as const
 export const updateTypeEnum = ["general", "milestone", "issue", "achievement"] as const
 

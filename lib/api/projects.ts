@@ -193,4 +193,233 @@ export class ProjectsAPI {
       }
     }
   }
+
+  // Milestone related methods
+  static async getProjectMilestones(projectId: number): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/milestones`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error fetching project milestones:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to fetch project milestones",
+      }
+    }
+  }
+
+  static async createMilestone(
+    projectId: number,
+    data: {
+      title: string
+      description?: string
+      date: string
+      completed?: boolean
+    },
+  ): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/milestones`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error creating milestone:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create milestone",
+      }
+    }
+  }
+
+  static async updateMilestone(
+    projectId: number,
+    milestoneId: number,
+    data: {
+      title?: string
+      description?: string
+      date?: string
+      completed?: boolean
+    },
+  ): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/milestones/${milestoneId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error updating milestone:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to update milestone",
+      }
+    }
+  }
+
+  static async deleteMilestone(projectId: number, milestoneId: number): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/milestones/${milestoneId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error deleting milestone:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to delete milestone",
+      }
+    }
+  }
+
+  // Project members related methods
+  static async getProjectMembers(projectId: number): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/members`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error fetching project members:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to fetch project members",
+      }
+    }
+  }
+
+  static async addProjectMember(
+    projectId: number,
+    data: {
+      userId: number
+      role?: string
+    },
+  ): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/members`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error adding project member:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to add project member",
+      }
+    }
+  }
+
+  static async removeProjectMember(projectId: number, userId: number): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/members/${userId}`, {
+        method: "DELETE",
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error removing project member:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to remove project member",
+      }
+    }
+  }
+
+  static async createProjectUpdate(
+    projectId: number,
+    data: {
+      title: string
+      description: string
+      updateType?: string
+    },
+  ): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/updates`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error creating project update:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to create project update",
+      }
+    }
+  }
+
+  static async getProjectUpdates(projectId: number): Promise<ApiResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/${projectId}/updates`)
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error("Error fetching project updates:", error)
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Failed to fetch project updates",
+      }
+    }
+  }
 }
+

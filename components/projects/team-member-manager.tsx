@@ -40,6 +40,7 @@ import {
   type CreateTeamMemberInput,
   type UpdateTeamMemberInput,
 } from "@/lib/api/team-members"
+import { UsersAPI } from "@/lib/api/users"
 
 interface TeamMemberManagerProps {
   projectId: number
@@ -57,7 +58,7 @@ interface AvailableUser {
 
 export function TeamMemberManager({ projectId, isTeamLead, initialMembers = [] }: TeamMemberManagerProps) {
   const [members, setMembers] = useState<TeamMember[]>(initialMembers)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null)
   const [availableUsers, setAvailableUsers] = useState<AvailableUser[]>([])
@@ -66,38 +67,39 @@ export function TeamMemberManager({ projectId, isTeamLead, initialMembers = [] }
   const [contributions, setContributions] = useState("")
   const [submitting, setSubmitting] = useState(false)
 
-  useEffect(() => {
-    loadMembers()
-  }, [projectId])
+  // useEffect(() => {
+  //   loadMembers()
+  // }, [projectId])
 
-  const loadMembers = async () => {
-    setLoading(true)
-    try {
-      const response = await TeamMembersAPI.getTeamMembers(projectId)
-      if (response.success && response.data) {
-        setMembers(response.data)
-      } else {
-        toast({
-          title: "Error",
-          description: response.error || "Failed to load team members",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      console.error("Error loading team members:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load team members",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+  // const loadMembers = async () => {
+  //   setLoading(true)
+  //   try {
+  //     const response = await TeamMembersAPI.getTeamMembers(projectId)
+  //     if (response.success && response.data) {
+  //       setMembers(response.data)
+  //     } else {
+  //       toast({
+  //         title: "Error",
+  //         description: response.error || "Failed to load team members",
+  //         variant: "destructive",
+  //       })
+  //     }
+  //   } catch (error) {
+  //     console.error("Error loading team members:", error)
+  //     toast({
+  //       title: "Error",
+  //       description: "Failed to load team members",
+  //       variant: "destructive",
+  //     })
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const loadAvailableUsers = async () => {
     try {
-      const response = await TeamMembersAPI.getAvailableUsers(projectId)
+      const response = await UsersAPI.getUsers()
+      console.log(response)
       if (response.success && response.data) {
         setAvailableUsers(response.data)
       } else {
@@ -150,6 +152,7 @@ export function TeamMemberManager({ projectId, isTeamLead, initialMembers = [] }
       }
 
       const response = await TeamMembersAPI.addTeamMember(createData)
+      console.log(response)
       if (response.success && response.data) {
         setMembers((prev) => [...prev, response.data!])
         toast({

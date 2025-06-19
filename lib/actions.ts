@@ -15,7 +15,7 @@ function safeParseDate(value: Date | string | null): Date {
 }
 
 // Task actions
-export async function getTasksByUserId(id : number): Promise<TaskWithTypedAssignees[]> {
+export async function getTasksByUserId(id: number): Promise<TaskWithTypedAssignees[]> {
   try {
     let rawTasks: any[] = [];
 
@@ -157,7 +157,9 @@ export async function addAssigneeToTask(id: number, assignee: Assignee): Promise
     const task = await TaskRepository.findById(id);
     if (!task) throw new Error("Task not found");
 
-    const assigner = await UserRepository.findById(task.assignerId);
+    let assigner;
+    if (task.assignerId)
+      assigner = await UserRepository.findById(task.assignerId);
     if (!assigner) throw new Error("Assigner not found");
 
     const currentAssignees = (task.assignees ?? []) as Assignee[];
@@ -219,7 +221,7 @@ export async function deleteTask(id: number): Promise<boolean> {
   }
 }
 
-export async function getAssignees(user_id : number): Promise<User[]> {
+export async function getAssignees(user_id: number): Promise<User[]> {
   try {
     return await UserRepository.findAssignees(user_id)
   } catch (error) {

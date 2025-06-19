@@ -20,6 +20,7 @@ import { Pencil, Calendar, Users, FileText, Loader2, ExternalLink } from "lucide
 import Link from "next/link"
 import DashboardLayout from "@/components/dashboard-layout"
 import { ProjectWithDetails } from "@/db"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -83,7 +84,8 @@ export default function ProjectDetailPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <LoadingSpinner />
+        {/* <Loader2 className="h-8 w-8 animate-spin" /> */}
       </div>
     )
   }

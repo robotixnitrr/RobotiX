@@ -4,14 +4,15 @@ import { updateProjectSchema } from "@/lib/validations/project"
 import { z } from "zod"
 
 interface RouteParams {
-    params: {
-        id: string
-    }
+    params: Promise<{
+        id: string;
+    }>;
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, context: RouteParams) {
     try {
-        const projectId = Number.parseInt(params.id)
+        const { id } = await context.params
+        const projectId = Number.parseInt(id)
 
         if (isNaN(projectId)) {
             return NextResponse.json(
@@ -53,9 +54,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+export async function PUT(request: NextRequest, context: RouteParams) {
     try {
-        const projectId = Number.parseInt(params.id)
+        const projectId = Number.parseInt((await context.params).id)
 
         if (isNaN(projectId)) {
             return NextResponse.json(
@@ -128,9 +129,9 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     }
 }
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(request: NextRequest, context: RouteParams) {
     try {
-        const projectId = Number.parseInt(params.id)
+        const projectId = Number.parseInt((await context.params).id)
 
         if (isNaN(projectId)) {
             return NextResponse.json(

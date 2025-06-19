@@ -49,21 +49,23 @@ export async function POST(request: NextRequest) {
 
     const cookieValue = encodeURIComponent(JSON.stringify(userWithoutPassword));
 
-    const response = new NextResponse(
-      JSON.stringify({
-        success: true,
-        user: userWithoutPassword,
-        message: "Login successful",
-      }),
-      {
-        status: 200,
-        headers: {
-          "Set-Cookie": `user=${cookieValue}; Path=/; Max-Age=86400; HttpOnly; Secure; SameSite=Strict`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response
+    const response = NextResponse.json({
+      success: true,
+      user: userWithoutPassword,
+      message: "Login successful",
+    });
+
+    response.cookies.set({
+      name: 'user',
+      value: cookieValue,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 24 * 30 * 5, // 1 day
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

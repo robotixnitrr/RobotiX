@@ -50,7 +50,7 @@ export class MilestonesAPI {
         },
       })
 
-      console.log(response)
+      // console.log(await response.json())
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
@@ -96,7 +96,7 @@ export class MilestonesAPI {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ data, user: localStorage.getItem('user') }),
       })
 
       const result = await response.json()
