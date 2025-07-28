@@ -252,8 +252,8 @@ export default function TeamPage() {
                               alt={member.name}
                             />
                             <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-                              {generateInitials(member.name)}
-                            </AvatarFallback>
+                              {generateInitials(member?.name || "")}
+                            </AvatarFallback>``
                           </Avatar>
                           <div
                             className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold text-white ${getPositionColor(member.position || "")}`}
