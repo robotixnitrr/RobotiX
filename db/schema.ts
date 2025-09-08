@@ -226,6 +226,24 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
   }),
 }))
 
+export const passwordResets = pgTable(
+  "password_resets",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    used: boolean("used").default(false).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    lastSentAt: timestamp("last_sent_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => ({
+    tokenIdx: index("idx_password_resets_token_hash").on(table.tokenHash),
+    userIdx: index("idx_password_resets_user_id").on(table.userId),
+    expiresIdx: index("idx_password_resets_expires_at").on(table.expiresAt),
+  })
+);
+
 // Types
 export type User = typeof users.$inferSelect
 export type CreateUserInput = typeof users.$inferInsert
