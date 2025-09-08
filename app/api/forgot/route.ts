@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, passwordResets } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { genToken, hashToken } from "@/lib/hash";
 import { sendResetEmail } from "@/lib/mail";
 
@@ -15,14 +15,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
-    // find user (do not reveal existence)
+    // find user (do not reveal)
     const found = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (found.length === 0) {
       return NextResponse.json({ ok: true });
     }
     const user = found[0];
 
-    // cooldown check (most recent)
+    // cooldown check using latest reset row
     const recent = await db
       .select()
       .from(passwordResets)
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       }
     }
 
-    // create token
+    // create token (raw for email), store hash
     const rawToken = genToken();
     const tokenHash = hashToken(rawToken);
     const expiresAt = new Date(now.getTime() + TOKEN_EXPIRE_MINUTES * 60 * 1000);
@@ -51,12 +51,21 @@ export async function POST(req: Request) {
       lastSentAt: now,
     });
 
-    // send email (await to surface errors)
-    await sendResetEmail(email, rawToken);
+    // send email — if this fails, return 502 in dev so you see details
+    try {
+      await sendResetEmail(email, rawToken);
+    } catch (err: any) {
+      console.error("[/api/forgot] sendResetEmail failed:", err?.message || err);
+      const isDev = process.env.NODE_ENV !== "production";
+      return NextResponse.json(
+        { error: isDev ? `Email send failed: ${err?.message || err}` : "Failed to send email" },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Forgot password error:", err);
+  } catch (err: any) {
+    console.error("[/api/forgot] error:", err?.message || err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

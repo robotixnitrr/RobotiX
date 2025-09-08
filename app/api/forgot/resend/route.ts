@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, passwordResets } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { genToken, hashToken } from "@/lib/hash";
 import { sendResetEmail } from "@/lib/mail";
 
@@ -21,7 +21,6 @@ export async function POST(req: Request) {
     }
     const user = found[0];
 
-    // check cooldown on last unused token
     const last = await db
       .select()
       .from(passwordResets)
@@ -50,11 +49,20 @@ export async function POST(req: Request) {
       lastSentAt: now,
     });
 
-    await sendResetEmail(email, rawToken);
+    try {
+      await sendResetEmail(email, rawToken);
+    } catch (err: any) {
+      console.error("[/api/forgot/resend] sendResetEmail failed:", err?.message || err);
+      const isDev = process.env.NODE_ENV !== "production";
+      return NextResponse.json(
+        { error: isDev ? `Email send failed: ${err?.message || err}` : "Failed to send email" },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("Resend error:", err);
+  } catch (err: any) {
+    console.error("[/api/forgot/resend] error:", err?.message || err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

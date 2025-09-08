@@ -12,12 +12,12 @@ export async function comparePassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
 }
 
-// store sha256(token) in DB
+// We store sha256(token) in DB for safety
 export function hashToken(token: string) {
   return crypto.createHash("sha256").update(token).digest("hex");
 }
 
-// generate random token (hex)
+// generate secure random hex token
 export function genToken(bytes = 32) {
   return crypto.randomBytes(bytes).toString("hex");
 }
