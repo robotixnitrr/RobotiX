@@ -118,7 +118,7 @@ export function AlumniSection() {
   const displayedAlumni: AlumniInterface[] = []
 
   return (
-    <section id="alumni" className="relative py-32 px-4 overflow-hidden">
+    <section id="alumni" className="relative py-16 sm:py-24 md:py-32 px-4 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:from-slate-950 dark:via-blue-950/30 dark:to-purple-950/20"></div>
       <div className="absolute inset-0">
@@ -129,21 +129,21 @@ export function AlumniSection() {
 
       <div className="container mx-auto relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-200/20 dark:border-blue-800/20 mb-6">
+        <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full border border-blue-200/20 dark:border-blue-800/20 mb-4 sm:mb-6">
             <Star className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Hall of Fame</span>
+            <span className="text-xs sm:text-sm font-medium text-blue-700 dark:text-blue-300">Hall of Fame</span>
           </div>
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 h-auto bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 h-auto bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 dark:from-white dark:via-slate-200 dark:to-slate-300 bg-clip-text text-transparent px-4">
             Distinguished Alumni
           </h2>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed px-4">
             Our alumni have gone on to shape the future at world's leading technology companies and research institutions
           </p>
         </div>
 
         {/* Alumni Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {displayedAlumni.map((alumni, index) => (
             <Card
               key={alumni.id}
@@ -263,22 +263,22 @@ export function AlumniSection() {
         </div>
 
         {/* Show More/Less Button */}
-        <div className="text-center mt-16">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        <div className="text-center mt-12 sm:mt-16 px-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
             <Button
               onClick={() => setShowAll(!showAll)}
               size="lg"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 sm:px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
               {showAll ? 'Show Less' : 'View All Alumni'}
               <ExternalLink className="ml-2 h-4 w-4" />
             </Button>
 
-            <Link href="/alumni">
+            <Link href="/alumni" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="px-8 py-3 rounded-full border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 hover:scale-105"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-full border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-300 hover:scale-105"
               >
                 Alumni Directory
                 <ExternalLink className="ml-2 h-4 w-4" />
@@ -288,7 +288,7 @@ export function AlumniSection() {
         </div>
 
         {/* Stats Section */}
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-3 gap-8">
+        <div className="mt-12 sm:mt-16 md:mt-20 grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 px-4">
           {[
             { number: "50+", label: "Alumni Network" },
             { number: "25+", label: "Tech Companies" },
@@ -296,10 +296,10 @@ export function AlumniSection() {
             { number: "100%", label: "Career Success" }
           ].map((stat, index) => (
             <div key={index} className="text-center group">
-              <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
+              <div className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent group-hover:scale-110 transition-transform duration-300">
                 {stat.number}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400 mt-1">{stat.label}</div>
+              <div className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1">{stat.label}</div>
             </div>
           ))}
         </div>

@@ -68,7 +68,7 @@ export function ContactSection() {
   ]
 
   return (
-    <section id="contact" className="relative py-32 px-4 overflow-hidden">
+    <section id="contact" className="relative py-16 sm:py-24 md:py-32 px-4 overflow-hidden">
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-muted/30">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
@@ -78,66 +78,66 @@ export function ContactSection() {
 
       <div className="container mx-auto relative z-10">
         {/* Header with floating elements */}
-        <div className="text-center mb-20 relative">
-          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-            <div className="w-24 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-full animate-pulse"></div>
+        <div className="text-center mb-12 sm:mb-16 md:mb-20 relative">
+          <div className="absolute -top-6 sm:-top-8 left-1/2 transform -translate-x-1/2">
+            <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-primary via-purple-500 to-primary rounded-full animate-pulse"></div>
           </div>
-          <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm px-6 py-2 rounded-full mb-6 border border-primary/20">
+          <div className="inline-flex items-center gap-2 bg-primary/10 backdrop-blur-sm px-4 sm:px-6 py-2 rounded-full mb-4 sm:mb-6 border border-primary/20">
             <Sparkles className="w-4 h-4 text-primary animate-pulse" />
-            <span className="text-sm font-medium text-primary">Let's Connect</span>
+            <span className="text-xs sm:text-sm font-medium text-primary">Let's Connect</span>
           </div>
-          <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent px-4">
             Get In Touch
           </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
             Ready to join our community of innovators or collaborate on 
             <span className="text-primary font-semibold"> groundbreaking projects</span>?
           </p>
         </div>
 
         {/* Stats Section */}
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-16 md:mb-20">
           {stats.map((stat, index) => (
             <div 
               key={index}
-              className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 text-center hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2"
+              className="group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-4 sm:p-6 text-center hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/10 hover:-translate-y-2"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div className="relative z-10">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <stat.icon className="w-8 h-8 text-white" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <stat.icon className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <div className="text-4xl font-bold text-primary mb-2 group-hover:scale-110 transition-transform duration-300">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-1 sm:mb-2 group-hover:scale-110 transition-transform duration-300">
                   {stat.value}
                 </div>
-                <p className="text-muted-foreground font-medium">{stat.label}</p>
+                <p className="text-sm sm:text-base text-muted-foreground font-medium">{stat.label}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 max-w-7xl mx-auto">
           {/* Contact Information */}
-          <div className="space-y-8">
-            <div className="space-y-6">
-              <h3 className="text-3xl font-bold mb-8 flex items-center gap-3">
-                <div className="w-2 h-8 bg-gradient-to-b from-primary to-purple-600 rounded-full"></div>
+          <div className="space-y-6 sm:space-y-8 mb-8 lg:mb-0">
+            <div className="space-y-4 sm:space-y-6">
+              <h3 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 flex items-center gap-3">
+                <div className="w-2 h-6 sm:h-8 bg-gradient-to-b from-primary to-purple-600 rounded-full"></div>
                 Connect With Us
               </h3>
               
               {contactInfo.map((info, index) => (
                 <div 
                   key={index} 
-                  className={`group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:${info.glowColor} hover:-translate-y-1`}
+                  className={`group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-4 sm:p-6 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:${info.glowColor} hover:-translate-y-1`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative z-10 flex items-start gap-4">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                      <info.icon className="h-7 w-7 text-white" />
+                  <div className="relative z-10 flex items-start gap-3 sm:gap-4">
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                      <info.icon className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-xl font-bold mb-1">{info.title}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">{info.description}</p>
+                      <h4 className="text-lg sm:text-xl font-bold mb-1">{info.title}</h4>
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-2">{info.description}</p>
                       <p className="font-semibold text-foreground">{info.content}</p>
                       {info.subtitle && (
                         <p className="text-sm text-muted-foreground">{info.subtitle}</p>
@@ -153,18 +153,18 @@ export function ContactSection() {
           <div className="relative">
             <Card className="relative bg-card/50 backdrop-blur-sm border-border/50 shadow-2xl shadow-primary/5 hover:shadow-primary/10 transition-all duration-500">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-purple-500/5 rounded-lg"></div>
-              <CardHeader className="relative z-10 text-center pb-6">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center">
-                  <Send className="w-8 h-8 text-white" />
+              <CardHeader className="relative z-10 text-center pb-4 sm:pb-6 p-4 sm:p-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center">
+                  <Send className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold">Send us a Message</CardTitle>
-                <CardDescription className="text-base">
+                <CardTitle className="text-xl sm:text-2xl font-bold">Send us a Message</CardTitle>
+                <CardDescription className="text-sm sm:text-base">
                   Let's discuss your ideas and bring them to life together
                 </CardDescription>
               </CardHeader>
-              <CardContent className="relative z-10 space-y-6">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-4">
+              <CardContent className="relative z-10 space-y-4 sm:space-y-6 p-4 sm:p-6 pt-0">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                  <div className="space-y-3 sm:space-y-4">
                     <div className="relative group">
                       <Input
                         name="name"
@@ -172,7 +172,7 @@ export function ContactSection() {
                         value={formData.name}
                         onChange={handleInputChange}
                         required
-                        className="h-12 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 group-hover:border-primary/50"
+                        className="h-10 sm:h-12 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 group-hover:border-primary/50"
                       />
                     </div>
                     <div className="relative group">
@@ -183,7 +183,7 @@ export function ContactSection() {
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="h-12 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 group-hover:border-primary/50"
+                        className="h-10 sm:h-12 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 group-hover:border-primary/50"
                       />
                     </div>
                     <div className="relative group">
