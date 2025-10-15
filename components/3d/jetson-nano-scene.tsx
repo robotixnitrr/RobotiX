@@ -1099,19 +1099,26 @@ export function JetsonNanoScene() {
   }
 
   return (
-    <div className="w-full h-full">
-      <Canvas
-        shadows
-        camera={{ position: [6, 4, 6], fov: 50 }}
-        gl={{ 
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance"
-        }}
-        onCreated={({ gl }) => {
-          gl.setClearColor('#0f0f23', 0)
-        }}
-      >
+    <Canvas
+      shadows
+      camera={{ position: [6, 4, 6], fov: 50 }}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 1
+      }}
+      gl={{ 
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance"
+      }}
+      onCreated={({ gl }) => {
+        gl.setClearColor('#000000', 0) // Fully transparent background
+      }}
+    >
         <Suspense fallback={null}>
           {/* Enhanced Camera with Zoom */}
           <CameraController />
@@ -1171,7 +1178,6 @@ export function JetsonNanoScene() {
           <Scene />
         </Suspense>
       </Canvas>
-    </div>
   )
 }
 

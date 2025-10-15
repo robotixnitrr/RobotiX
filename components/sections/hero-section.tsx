@@ -118,50 +118,40 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column - 3D Scene */}
-          <div className="order-1 lg:order-2 h-[400px] sm:h-[500px] lg:h-[600px] w-full">
-            <div className="relative h-full w-full rounded-2xl overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 border border-primary/10 shadow-2xl">
-              {/* 3D Jetson Nano Scene */}
+          {/* Right Column - 3D Scene Integrated */}
+          <div className="order-1 lg:order-2 h-[400px] sm:h-[500px] lg:h-[600px] w-full relative overflow-hidden">
+            {/* 3D Jetson Nano Scene - Absolute positioned, no boundaries */}
+            <div className="absolute inset-0 w-full h-full">
               <JetsonNanoScene />
-              
-              {/* Overlay Elements */}
-              <div className="absolute top-4 left-4 z-10">
-                <div className="bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/20">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium text-muted-foreground">AI Computing Active</span>
-                  </div>
+            </div>
+            
+            {/* Floating Control Instructions */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+              <div className="bg-background/70 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/20">
+                <span className="text-xs font-medium text-muted-foreground">Scroll to Zoom • Drag to Rotate • Click Button to Toggle AI</span>
+              </div>
+            </div>
+
+            {/* Floating Tech Specs - Positioned to not interfere with 3D model */}
+            <div className="absolute top-4 left-4 z-10 hidden lg:block">
+              <div className="space-y-2">
+                <div className="bg-background/80 backdrop-blur-sm rounded-lg p-3 border border-primary/20">
+                  <div className="text-xs font-semibold text-primary mb-1">NVIDIA Jetson Nano</div>
+                  <div className="text-xs text-muted-foreground">AI Computing Module</div>
                 </div>
               </div>
+            </div>
 
-              <div className="absolute bottom-4 right-4 z-10">
-                <div className="bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/20">
-                  <span className="text-xs font-medium text-primary">Interactive 3D Model</span>
+            {/* Quick Specs on Right */}
+            <div className="absolute top-4 right-4 z-10 hidden lg:block">
+              <div className="space-y-2">
+                <div className="bg-background/80 backdrop-blur-sm rounded-lg p-2 border border-primary/20">
+                  <div className="text-xs font-semibold text-primary">472 GFLOPS</div>
+                  <div className="text-xs text-muted-foreground">AI Performance</div>
                 </div>
-              </div>
-
-              {/* Zoom Instructions */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-                <div className="bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-primary/20">
-                  <span className="text-xs font-medium text-muted-foreground">Scroll to Zoom • Touch to Rotate</span>
-                </div>
-              </div>
-
-              {/* Floating Info Cards */}
-              <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-10 hidden lg:block">
-                <div className="space-y-3">
-                  <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-primary/20 animate-pulse">
-                    <div className="text-xs font-semibold text-primary mb-1">GPU</div>
-                    <div className="text-xs text-muted-foreground">128-core Maxwell</div>
-                  </div>
-                  <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-primary/20 animate-pulse" style={{animationDelay: '0.5s'}}>
-                    <div className="text-xs font-semibold text-primary mb-1">CPU</div>
-                    <div className="text-xs text-muted-foreground">Quad-core ARM A57</div>
-                  </div>
-                  <div className="bg-background/90 backdrop-blur-sm rounded-lg p-3 border border-primary/20 animate-pulse" style={{animationDelay: '1s'}}>
-                    <div className="text-xs font-semibold text-primary mb-1">Memory</div>
-                    <div className="text-xs text-muted-foreground">4GB LPDDR4</div>
-                  </div>
+                <div className="bg-background/80 backdrop-blur-sm rounded-lg p-2 border border-primary/20">
+                  <div className="text-xs font-semibold text-primary">4GB LPDDR4</div>
+                  <div className="text-xs text-muted-foreground">Memory</div>
                 </div>
               </div>
             </div>
