@@ -182,7 +182,7 @@ export function Navigation() {
                         Login
                       </Button>
                     </Link>
-                    <Link href="/register">
+                    {/*<Link href="/register">
                       <Button 
                         size="sm"
                         className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 group"
@@ -190,7 +190,7 @@ export function Navigation() {
                         Join Club
                         <Sparkles className="ml-1 h-3 w-3 group-hover:rotate-12 transition-transform duration-300" />
                       </Button>
-                    </Link>
+                    </Link>*/}
                   </>
                 )}
               </div>
