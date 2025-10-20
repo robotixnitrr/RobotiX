@@ -150,6 +150,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(errorMessage)
       }
 
+
+
+
       const data = await response.json()
 
       // Save user to state and localStorage
