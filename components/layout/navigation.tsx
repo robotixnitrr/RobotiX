@@ -263,14 +263,14 @@ export function Navigation() {
                               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                             </Button>
                           </Link>
-                          <Link href="/register" onClick={() => setIsOpen(false)}>
+                          {/* <Link href="/register" onClick={() => setIsOpen(false)}>
                             <Button 
                               className="w-full bg-gradient-to-r from-primary to-primary/80 shadow-lg shadow-primary/25 group"
                             >
                               Join Club
                               <Sparkles className="ml-2 h-4 w-4 group-hover:rotate-12 transition-transform duration-300" />
                             </Button>
-                          </Link>
+                          </Link> */}
                         </>
                       )}
                     </div>
