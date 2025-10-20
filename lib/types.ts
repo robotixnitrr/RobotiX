@@ -5,21 +5,27 @@ export interface Assignee {
   assignedAt: Date;
 }
 
-export interface AlumniInterface {
-  id: 1,
-  name: string,
-  position: string,
-  years: string,
-  currentRole: string,
-  avatar: string,
-  bio: string,
-  achievements: string[],
-  skills: string[],
-  linkedin: string,
-  github: string,
-  featured: Boolean,
-  company: string,
-  location: string,
-  graduationYear?: number,
-  testimonial?: string,
+// export interface AlumniInterface {
+//   id: 1,
+//   name: string,
+//   position: string,
+//   years: string,
+//   currentRole: string,
+//   avatar: string,
+//   bio: string,
+//   achievements: string[],
+//   skills: string[],
+//   linkedin: string,
+//   github: string,
+//   featured: Boolean,
+//   company: string,
+//   location: string,
+//   graduationYear?: number,
+//   testimonial?: string,
+// }
+export interface AlumniInterface{
+  id:number,
+  name:string,
+  branch:string,
+  linkedin?:string,
 }
