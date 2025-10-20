@@ -75,6 +75,13 @@ export const APP_CONFIG = {
   author: "RobotiX Club",
 } as const
 
+export const SOCIAL_LINKS = {
+  instagram: "https://www.instagram.com/robotix_nitrr?igsh=MXBnNWd2Nm91OGd5dQ==",
+  linkedin: "https://www.linkedin.com/company/robotix-nitrr/",
+  github: "https://github.com/robotixnitrr",
+  email: "robotixclub@nitrr.ac.in",
+} as const
+
 export const STATUS_COLORS = {
   pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
   "in-progress": "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",

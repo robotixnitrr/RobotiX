@@ -6,8 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowRight, Mail, Phone, MapPin, Calendar, Send, Sparkles, Globe, Users2, Zap } from "lucide-react"
-import { ROUTES } from "@/lib/constants"
+import { ArrowRight, Mail, Phone, MapPin, Calendar, Send, Sparkles, Globe, Users2, Zap, Linkedin, Instagram, Github } from "lucide-react"
+import { ROUTES, SOCIAL_LINKS } from "@/lib/constants"
 
 export function ContactSection() {
   const [formData, setFormData] = useState({
@@ -125,27 +125,51 @@ export function ContactSection() {
                 Connect With Us
               </h3>
               
-              {contactInfo.map((info, index) => (
-                <div 
-                  key={index} 
-                  className={`group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:${info.glowColor} hover:-translate-y-1`}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="relative z-10 flex items-start gap-4">
-                    <div className={`w-14 h-14 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
-                      <info.icon className="h-7 w-7 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold mb-1">{info.title}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">{info.description}</p>
-                      <p className="font-semibold text-foreground">{info.content}</p>
-                      {info.subtitle && (
-                        <p className="text-sm text-muted-foreground">{info.subtitle}</p>
-                      )}
+              {contactInfo.map((info, index) => {
+                const Icon = info.icon
+                return (
+                  <div
+                    key={index}
+                    className={`group relative bg-card/50 backdrop-blur-sm border border-border/50 rounded-2xl p-6 hover:border-primary/50 transition-all duration-500 hover:shadow-2xl ${info.glowColor} hover:-translate-y-1`}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="relative z-10 flex items-start gap-4">
+                      <div className={`w-14 h-14 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        <Icon className="h-7 w-7 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-xl font-bold mb-1">{info.title}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">{info.description}</p>
+                        <p className="font-semibold text-foreground">
+                          {info.title === "Email" ? (
+                            <a href={`mailto:${SOCIAL_LINKS.email}`} className="underline text-primary">{SOCIAL_LINKS.email}</a>
+                          ) : (
+                            info.content
+                          )}
+                        </p>
+                        {info.subtitle && (
+                          <p className="text-sm text-muted-foreground">{info.subtitle}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
+                )
+              })}
+
+              <div className="mt-4">
+                <h4 className="text-sm font-semibold text-muted-foreground mb-2">Follow us</h4>
+                <div className="flex items-center gap-3">
+                  <a href={SOCIAL_LINKS.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-2 rounded-md bg-card hover:scale-105 transition-transform">
+                    <Instagram className="h-5 w-5" />
+                  </a>
+                  <a href={SOCIAL_LINKS.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="p-2 rounded-md bg-card hover:scale-105 transition-transform">
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                  <a href={SOCIAL_LINKS.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="p-2 rounded-md bg-card hover:scale-105 transition-transform">
+                    <Github className="h-5 w-5" />
+                  </a>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
@@ -228,14 +252,15 @@ export function ContactSection() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Link href={ROUTES.register} className="w-full">
-                    <Button variant="outline" className="w-full h-12 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 hover:scale-[1.02]">
+                  {/* Registration temporarily closed - replaced with disabled CTA */}
+                  <div className="w-full">
+                    <Button disabled className="w-full h-12 border-border/20 bg-muted/5 text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Users2 className="w-4 h-4" />
-                        Join Club
+                        Registration Closed
                       </div>
                     </Button>
-                  </Link>
+                  </div>
                   <Link href={ROUTES.login} className="w-full">
                     <Button variant="outline" className="w-full h-12 border-primary/20 hover:border-primary hover:bg-primary/5 transition-all duration-300 hover:scale-[1.02]">
                       <div className="flex items-center gap-2">

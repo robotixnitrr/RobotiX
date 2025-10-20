@@ -321,12 +321,11 @@ export default function TeamPage() {
                     </Link>
                   ) : (
                     <>
-                      <Link href={ROUTES.register}>
-                        <Button size="lg">
-                          Join RobotiX Club
-                          <Users className="ml-2 h-5 w-5" />
-                        </Button>
-                      </Link>
+                      {/* Registration temporarily closed - link commented out */}
+                      <Button disabled size="lg" className="opacity-70">
+                        Join RobotiX Club
+                        <Users className="ml-2 h-5 w-5" />
+                      </Button>
                       <Link href="/#contact">
                         <Button variant="outline" size="lg">
                           Contact Us

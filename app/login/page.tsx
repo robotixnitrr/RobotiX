@@ -111,12 +111,9 @@ export default function LoginPage() {
               </Button>
             </div> */}
 
-            {/* <div className="text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-primary underline-offset-4 hover:underline">
-                Create account
-              </Link>
-            </div> */}
+            <div className="text-center text-sm">
+              Don&apos;t have an account? <span className="text-sm text-muted-foreground">Registration temporarily closed.</span>
+            </div>
           </CardFooter>
         </form>
       </Card>
