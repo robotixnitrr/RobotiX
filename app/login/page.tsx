@@ -85,9 +85,9 @@ export default function LoginPage() {
               <div className="absolute inset-0 flex items-center">
                 <Separator className="w-full" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
+              {/* <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">Or try demo accounts</span>
-              </div>
+              </div> */}
             </div>
 
             {/* <div className="grid grid-cols-2 gap-2 w-full">
@@ -111,12 +111,12 @@ export default function LoginPage() {
               </Button>
             </div> */}
 
-            <div className="text-center text-sm">
+            {/* <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="text-primary underline-offset-4 hover:underline">
                 Create account
               </Link>
-            </div>
+            </div> */}
           </CardFooter>
         </form>
       </Card>
