@@ -195,6 +195,37 @@
   }
 }
 
+/* Better mobile text wrapping */
+@media (max-width: 768px) {
+  h1, h2, h3 {
+    word-break: break-word;
+    hyphens: auto;
+  }
+  
+  /* Improved button spacing on mobile */
+  .mobile-button-stack {
+    width: 100%;
+  }
+  
+  .mobile-button-stack > * {
+    width: 100%;
+  }
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better mobile touch targets */
+@media (max-width: 768px) {
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
 /* Enhanced card styling with animations */
 .task-card {
   height: 100%;

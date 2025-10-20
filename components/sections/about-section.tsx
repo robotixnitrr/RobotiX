@@ -74,7 +74,7 @@ export function AboutSection() {
     <section 
       id="about" 
       ref={sectionRef}
-      className="py-32 px-4 bg-gradient-to-b from-background via-muted/30 to-background relative overflow-hidden"
+      className="py-16 sm:py-24 md:py-32 px-4 bg-gradient-to-b from-background via-muted/30 to-background relative overflow-hidden"
     >
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
@@ -83,17 +83,17 @@ export function AboutSection() {
       
       <div className="container mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-24">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border border-primary/20 text-primary mb-8">
-            <Target className="h-5 w-5" />
-            <span className="text-sm font-semibold tracking-wide uppercase">Our Foundation</span>
+        <div className="text-center mb-16 sm:mb-20 md:mb-24">
+          <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6 sm:mb-8">
+            <Target className="h-4 sm:h-5 w-4 sm:w-5" />
+            <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase">Our Foundation</span>
           </div>
           
-          <h2 className="text-5xl md:text-7xl font-black mb-8 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-6 sm:mb-8 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent px-4">
             Redefining Tomorrow
           </h2>
           
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-light">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed font-light px-4">
             We are a revolutionary collective of innovators, engineers, and visionaries 
             dedicated to <span className="text-primary font-semibold">transforming possibilities</span> into 
             reality through robotics and artificial intelligence.
@@ -101,7 +101,7 @@ export function AboutSection() {
         </div>
 
         {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
           {features.map((feature, index) => (
             <Card 
               key={index} 
@@ -119,15 +119,15 @@ export function AboutSection() {
               {/* Glow Effect */}
               <div className={`absolute -inset-0.5 bg-gradient-to-r ${feature.color} rounded-lg blur opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
               
-              <CardHeader className="relative z-10 pb-4">
-                <div className="relative mb-6">
-                  <div className={`w-20 h-20 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}>
-                    <feature.icon className="h-10 w-10 text-white" />
+              <CardHeader className="relative z-10 pb-3 sm:pb-4">
+                <div className="relative mb-4 sm:mb-6">
+                  <div className={`w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}>
+                    <feature.icon className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
                   </div>
                   <div className={`absolute -inset-1 bg-gradient-to-r ${feature.color} rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
                 </div>
                 
-                <CardTitle className="text-2xl font-bold mb-4 group-hover:text-primary transition-colors duration-300">
+                <CardTitle className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 group-hover:text-primary transition-colors duration-300">
                   {feature.title}
                 </CardTitle>
               </CardHeader>
@@ -145,19 +145,19 @@ export function AboutSection() {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-24">
-          <div className="inline-flex items-center gap-4 px-8 py-4 rounded-full bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20">
-            <div className="flex -space-x-2">
+        <div className="text-center mt-16 sm:mt-20 md:mt-24">
+          <div className="inline-flex items-center gap-3 sm:gap-4 px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border border-primary/20">
+            <div className="flex -space-x-1 sm:-space-x-2">
               {[...Array(4)].map((_, i) => (
                 <div 
                   key={i}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 border-2 border-background flex items-center justify-center text-xs font-bold text-primary-foreground"
+                  className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 border-2 border-background flex items-center justify-center text-xs font-bold text-primary-foreground"
                 >
                   {String.fromCharCode(65 + i)}
                 </div>
               ))}
             </div>
-            <span className="text-sm font-medium text-muted-foreground">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">
               Join 50+ innovators shaping the future
             </span>
           </div>

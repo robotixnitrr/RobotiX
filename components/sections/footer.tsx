@@ -24,10 +24,10 @@ export function Footer() {
   ]
 
   return (
-    <footer className="border-t border-border/50 py-12 px-4 bg-muted/30">
+    <footer className="border-t border-border/50 py-8 sm:py-12 px-4 bg-muted/30">
       <div className="container mx-auto">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-3">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/logoBlack.png" alt="RobotiX Logo" />
@@ -70,7 +70,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-border/50 mt-8 pt-8 text-center text-sm text-muted-foreground">
+        <div className="border-t border-border/50 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm text-muted-foreground">
           <p>&copy; 2025 {APP_CONFIG.name}. All rights reserved.</p>
         </div>
       </div>

@@ -103,31 +103,31 @@ export function FeaturedProjectsSection() {
   }
 
   return (
-    <section className="py-32 px-4 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
+    <section className="py-16 sm:py-24 md:py-32 px-4 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(120,119,198,0.15),transparent_70%)]" />
       <div className="absolute top-0 left-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
 
       <div className="container mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary mb-8">
-            <Zap className="h-5 w-5" />
-            <span className="text-sm font-semibold tracking-wide uppercase">Innovation Showcase</span>
+        <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 text-primary mb-6 sm:mb-8">
+            <Zap className="h-4 sm:h-5 w-4 sm:w-5" />
+            <span className="text-xs sm:text-sm font-semibold tracking-wide uppercase">Innovation Showcase</span>
           </div>
 
-          <h2 className="text-5xl md:text-7xl font-black mb-8 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black mb-6 sm:mb-8 bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent px-4">
             Featured Projects
           </h2>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light px-4">
             Discover our most <span className="text-primary font-semibold">groundbreaking innovations</span> and
             cutting-edge solutions that are shaping the future
           </p>
         </div>
 
         {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
           {projects?.map((project, index) => {
             const statusConfig = getStatusConfig(project.status)
             return (
@@ -147,7 +147,7 @@ export function FeaturedProjectsSection() {
                     alt={project.title}
                     width={400}
                     height={300}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+                    className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:scale-110 transition-transform duration-700"
                   />
 
                   {/* Overlay */}
@@ -186,18 +186,18 @@ export function FeaturedProjectsSection() {
                 </div>
 
                 {/* Content */}
-                <CardHeader className="relative z-10 pb-3">
-                  <CardTitle className="text-2xl font-bold line-clamp-2 group-hover:text-primary transition-colors duration-300">
+                <CardHeader className="relative z-10 pb-3 p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold line-clamp-2 group-hover:text-primary transition-colors duration-300">
                     {project.title}
                   </CardTitle>
-                  <CardDescription className="line-clamp-3 text-base leading-relaxed">
+                  <CardDescription className="line-clamp-3 text-sm sm:text-base leading-relaxed">
                     {project.description}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="relative z-10 space-y-4">
+                <CardContent className="relative z-10 space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0">
                   {/* Technologies */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1 sm:gap-2">
                     {project.technologies?.slice(0, 3)?.map((tech, techIndex) => (
                       <Badge
                         key={techIndex}
@@ -248,18 +248,18 @@ export function FeaturedProjectsSection() {
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-20">
-          <div className="inline-flex flex-col items-center gap-6">
+        <div className="text-center mt-12 sm:mt-16 md:mt-20 px-4">
+          <div className="inline-flex flex-col items-center gap-4 sm:gap-6">
             <div className="text-sm text-muted-foreground font-medium">
               Explore our complete portfolio of innovations
             </div>
-            <Link href={ROUTES.projects}>
+            <Link href={ROUTES.projects} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="text-lg px-10 py-6 rounded-full bg-gradient-to-r from-primary via-primary/90 to-accent hover:from-primary/90 hover:to-primary transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group"
+                className="w-full sm:w-auto text-base sm:text-lg px-8 sm:px-10 py-5 sm:py-6 rounded-full bg-gradient-to-r from-primary via-primary/90 to-accent hover:from-primary/90 hover:to-primary transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl group"
               >
                 View All Projects
-                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 sm:ml-3 h-5 sm:h-6 w-5 sm:w-6 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           </div>

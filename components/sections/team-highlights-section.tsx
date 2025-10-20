@@ -72,14 +72,14 @@ export function TeamHighlightsSection() {
   }
 
   return (
-    <section className="py-20 px-4 bg-muted/30">
+    <section className="py-16 sm:py-20 px-4 bg-muted/30">
       <div className="container mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4">Meet Our Leaders</h2>
-          <p className="text-xl text-muted-foreground">The passionate individuals driving innovation at RobotiX Club</p>
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 px-4">Meet Our Leaders</h2>
+          <p className="text-lg sm:text-xl text-muted-foreground px-4">The passionate individuals driving innovation at RobotiX Club</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {members.map((member, index) => (
             <Card key={member.id} className="text-center group hover:shadow-xl transition-all duration-300">
               <CardHeader>
@@ -109,9 +109,9 @@ export function TeamHighlightsSection() {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-8 sm:mt-12 px-4">
           <Link href={ROUTES.team}>
-            <Button size="lg" variant="outline">
+            <Button size="lg" variant="outline" className="w-full sm:w-auto">
               Meet Full Team
               <Users className="ml-2 h-5 w-5" />
             </Button>

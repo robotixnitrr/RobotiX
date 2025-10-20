@@ -93,39 +93,41 @@ export function Navigation() {
           "fixed top-0 z-50 w-full transition-all duration-500",
           isScrolled 
             ? "py-2" 
-            : "py-4"
+            : "py-3 sm:py-4"
         )}
       >
         <div className="container mx-auto px-4">
           <div 
             className={cn(
-              "flex h-14 items-center justify-between rounded-2xl border backdrop-blur-md transition-all duration-500",
+              "flex h-12 sm:h-14 items-center justify-between rounded-2xl border backdrop-blur-md transition-all duration-500",
               isScrolled 
                 ? "bg-background/95 shadow-lg shadow-primary/5 border-primary/10" 
                 : "bg-background/50 border-border/50"
             )}
           >
             {/* Logo with enhanced animation */}
-            <Link href="/" className="flex items-center space-x-3 group">
+            <Link href="/" className="flex items-center space-x-2 sm:space-x-3 group">
               <div className={cn(
                 "relative flex items-center justify-center rounded-xl transition-all duration-500 group-hover:scale-105",
-                isScrolled ? "h-9 w-9" : "h-10 w-10"
+                isScrolled ? "h-8 w-8 sm:h-9 sm:w-9" : "h-9 w-9 sm:h-10 sm:w-10"
               )}>
-                {/* <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 group-hover:shadow-lg group-hover:shadow-primary/25 transition-all duration-300" />
-                <div className="absolute inset-0.5 rounded-[10px] bg-gradient-to-br from-primary-foreground/20 to-transparent" /> */}
                 <span className="relative group-hover:scale-110 transition-transform duration-300">
-                  {/* R */}
-                <img src="./logoBlack.png" alt="" className="dark:hidden"/>
-                <img src="./logoWhite.png" alt="" className="hidden dark:block"/>
+                <img src="./logoBlack.png" alt="RobotiX Club" className="dark:hidden h-full w-full object-contain"/>
+                <img src="./logoWhite.png" alt="RobotiX Club" className="hidden dark:block h-full w-full object-contain"/>
                 </span>
-                {/* <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-primary/60 animate-pulse" /> */}
               </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg leading-none group-hover:text-primary transition-colors duration-300">
+              <div className="flex flex-col hidden sm:block">
+                <span className="font-bold text-base sm:text-lg leading-none group-hover:text-primary transition-colors duration-300">
                   RobotiX Club
                 </span>
-                <span className="text-xs text-muted-foreground leading-none">
+                <span className="text-xs text-muted-foreground leading-none hidden sm:block">
                   Innovation Hub
+                </span>
+              </div>
+              {/* Mobile: Show only RobotiX */}
+              <div className="sm:hidden">
+                <span className="font-bold text-lg leading-none group-hover:text-primary transition-colors duration-300">
+                  RobotiX
                 </span>
               </div>
             </Link>
@@ -156,8 +158,10 @@ export function Navigation() {
             </nav>
 
             {/* Actions */}
-            <div className="flex items-center space-x-3">
-              <ModeToggle />
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="hidden sm:block">
+                <ModeToggle />
+              </div>
 
               <div className="hidden md:flex items-center space-x-2">
                 {user ? (
@@ -212,12 +216,15 @@ export function Navigation() {
                   className="w-[320px] border-l-primary/20 bg-background/95 backdrop-blur-xl"
                 >
                   <div className="flex flex-col space-y-6 mt-8">
-                    {/* Mobile logo */}
-                    <div className="flex items-center space-x-3 px-2">
-                      <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                        <span className="text-primary-foreground font-bold text-sm">R</span>
+                    {/* Mobile header */}
+                    <div className="flex items-center justify-between pb-6 border-b border-border/50">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                          <span className="text-primary-foreground font-bold text-sm">R</span>
+                        </div>
+                        <span className="font-bold text-lg">RobotiX Club</span>
                       </div>
-                      <span className="font-bold text-lg">RobotiX Club</span>
+                      <ModeToggle />
                     </div>
 
                     {/* Mobile navigation */}

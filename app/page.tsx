@@ -10,7 +10,7 @@ import { AlumniSection } from "@/components/sections/alumni-section"
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <div className="nav h-[5rem]">
+      <div className="nav h-16 sm:h-20">
         <Navigation />
       </div>
       <div className="">
