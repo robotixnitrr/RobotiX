@@ -20,6 +20,7 @@ export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const DEFAULT_COOLDOWN = 30;
   const [cooldown, setCooldown] = useState<number>(0);
@@ -64,9 +65,10 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     setMessage(null);
+    setError(null);
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setMessage("Please enter a valid email address.");
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -79,21 +81,23 @@ export default function ForgotPasswordPage() {
       });
       const json = await res.json().catch(() => ({}));
 
-      // Always show success message regardless of response
+      if (!res.ok) {
+        // Show error message if email not found or other error
+        setError(json?.error || "Failed to send reset link. Please try again.");
+        return;
+      }
+
       if (json?.cooldown) {
         setMessage("Request received. Please wait before trying again.");
         startCooldown(DEFAULT_COOLDOWN);
       } else {
         setIsSent(true);
-        setMessage("If an account exists for that email, a reset link has been sent.");
+        setMessage("Reset link has been sent to your email address.");
         startCooldown(DEFAULT_COOLDOWN);
       }
     } catch (err) {
       console.error("Forgot submit error:", err);
-      // Always show success message even on error
-      setIsSent(true);
-      setMessage("If an account exists for that email, a reset link has been sent.");
-      startCooldown(DEFAULT_COOLDOWN);
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +106,7 @@ export default function ForgotPasswordPage() {
   const handleResend = async () => {
     if (cooldown > 0) return;
     setMessage(null);
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -112,7 +117,12 @@ export default function ForgotPasswordPage() {
       });
       const json = await res.json().catch(() => ({}));
 
-      // Always show success message regardless of response
+      if (!res.ok) {
+        // Show error message if email not found or other error
+        setError(json?.error || "Failed to resend. Please try again.");
+        return;
+      }
+
       if (json?.cooldown) {
         setMessage("A reset was recently sent. Please wait before trying again.");
         startCooldown(DEFAULT_COOLDOWN);
@@ -122,9 +132,7 @@ export default function ForgotPasswordPage() {
       }
     } catch (err) {
       console.error("Resend error:", err);
-      // Always show success message even on error
-      setMessage("Reset link resent. Check your inbox.");
-      startCooldown(DEFAULT_COOLDOWN);
+      setError("Network error. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -153,6 +161,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             {message ? <div className="text-sm text-green-600">{message}</div> : null}
+            {error ? <div className="text-sm text-destructive">{error}</div> : null}
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">

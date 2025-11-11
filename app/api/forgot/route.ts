@@ -28,9 +28,9 @@ export async function POST(req: Request) {
     console.log(`[/api/forgot] Database query result: ${found.length > 0 ? 'User found' : 'User not found'}`);
     
     if (found.length === 0) {
-      // Email not registered - return success to prevent email enumeration, but log the attempt
+      // Email not registered - return error so frontend can display appropriate message
       console.log(`[/api/forgot] Password reset requested for unregistered email: ${normalizedEmail}`);
-      return NextResponse.json({ ok: true });
+      return NextResponse.json({ error: "No account found with this email address" }, { status: 404 });
     }
     
     const user = found[0];
