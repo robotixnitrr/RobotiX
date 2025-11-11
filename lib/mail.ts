@@ -42,28 +42,65 @@ export async function sendResetEmail(toEmail: string, rawToken: string) {
   // Try Resend first
   try {
     console.log("[lib/mail] Attempting to send via Resend to:", toEmail);
+    console.log("[lib/mail] From email:", FROM_EMAIL || "no-reply@example.com");
+    console.log("[lib/mail] Resend API key present:", !!RESEND_API_KEY);
+    
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+
     const resp = await resend.emails.send({
-      from: FROM_EMAIL || "no-reply@example.com",
+      from: FROM_EMAIL || "onboarding@resend.dev",
       to: toEmail,
       subject: "Reset your RobotiX password",
       html,
       text: `Open this link to reset your password: ${resetUrl}`,
     });
 
-    console.log("[lib/mail] Resend response:", resp);
+    console.log("[lib/mail] Resend response:", JSON.stringify(resp, null, 2));
+    
+    // Check if response indicates an error
+    if (resp && 'error' in resp) {
+      throw new Error(`Resend API error: ${JSON.stringify(resp.error)}`);
+    }
+    
+    if (!resp || !resp.id) {
+      console.warn("[lib/mail] Resend response missing ID:", resp);
+    }
+    
     return resp;
   } catch (err: any) {
     const msg = err?.message || JSON.stringify(err);
-    console.warn("[lib/mail] Resend failed:", msg);
+    const errorDetails = {
+      message: msg,
+      statusCode: err?.statusCode,
+      name: err?.name,
+      response: err?.response,
+    };
+    console.error("[lib/mail] Resend failed with details:", JSON.stringify(errorDetails, null, 2));
 
-    // Detect common "testing-mode / invalid_from / unauthorized" cases and fall back to SMTP
+    // Detect common Resend errors that should trigger SMTP fallback or better error messages
     const isResendDomainError =
       (err && err.statusCode === 403) ||
+      (err && err.statusCode === 401) ||
       /verify a domain/i.test(msg) ||
       /only send testing emails/i.test(msg) ||
       /invalid_from/i.test(msg) ||
-      /Unauthorized/i.test(msg);
+      /Unauthorized/i.test(msg) ||
+      /invalid api key/i.test(msg) ||
+      /api key/i.test(msg) ||
+      /domain/i.test(msg);
+    
+    const isResendConfigError = 
+      /RESEND_API_KEY/i.test(msg) ||
+      /not configured/i.test(msg) ||
+      /missing/i.test(msg);
 
+    // If it's a configuration error, throw immediately with clear message
+    if (isResendConfigError) {
+      throw new Error(`Resend configuration error: ${msg}. Please set RESEND_API_KEY in your environment variables.`);
+    }
+    
     if (!isResendDomainError) {
       // If error is something else, rethrow so caller can handle/log accordingly
       throw err;

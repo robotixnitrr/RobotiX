@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users, passwordResets } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ilike } from "drizzle-orm";
 import { genToken, hashToken } from "@/lib/hash";
 import { sendResetEmail } from "@/lib/mail";
 
@@ -15,11 +15,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
-    const found = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    // find user - verify email is registered (case-insensitive check)
+    const normalizedEmail = email.trim();
+    console.log(`[/api/forgot/resend] Checking if email is registered: ${normalizedEmail}`);
+    
+    const found = await db
+      .select()
+      .from(users)
+      .where(ilike(users.email, normalizedEmail))
+      .limit(1);
+    
+    console.log(`[/api/forgot/resend] Database query result: ${found.length > 0 ? 'User found' : 'User not found'}`);
+    
     if (found.length === 0) {
-      return NextResponse.json({ ok: true });
+      // Email not registered - return error so frontend can display appropriate message
+      console.log(`[/api/forgot/resend] Password reset resend requested for unregistered email: ${normalizedEmail}`);
+      return NextResponse.json({ error: "No account found with this email address" }, { status: 404 });
     }
+    
     const user = found[0];
+    console.log(`[/api/forgot/resend] User found with ID: ${user.id}, email: ${user.email}, proceeding with password reset resend`);
 
     const last = await db
       .select()
@@ -49,20 +64,19 @@ export async function POST(req: Request) {
       lastSentAt: now,
     });
 
+    // send email — log errors but always return success to user
     try {
       await sendResetEmail(email, rawToken);
     } catch (err: any) {
+      // Log error for debugging but don't expose to user
       console.error("[/api/forgot/resend] sendResetEmail failed:", err?.message || err);
-      const isDev = process.env.NODE_ENV !== "production";
-      return NextResponse.json(
-        { error: isDev ? `Email send failed: ${err?.message || err}` : "Failed to send email" },
-        { status: 502 }
-      );
+      // Still return success to prevent information leakage
     }
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
     console.error("[/api/forgot/resend] error:", err?.message || err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    // Always return success even on internal errors
+    return NextResponse.json({ ok: true });
   }
 }

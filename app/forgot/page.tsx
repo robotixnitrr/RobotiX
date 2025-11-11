@@ -64,8 +64,8 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    setError(null);
     setMessage(null);
+    setError(null);
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError("Please enter a valid email address.");
@@ -82,7 +82,8 @@ export default function ForgotPasswordPage() {
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError((json && json.error) || "Failed to send reset link. Try later.");
+        // Show error message if email not found or other error
+        setError(json?.error || "Failed to send reset link. Please try again.");
         return;
       }
 
@@ -91,7 +92,7 @@ export default function ForgotPasswordPage() {
         startCooldown(DEFAULT_COOLDOWN);
       } else {
         setIsSent(true);
-        setMessage("If an account exists for that email, a reset link has been sent.");
+        setMessage("Reset link has been sent to your email address.");
         startCooldown(DEFAULT_COOLDOWN);
       }
     } catch (err) {
@@ -104,8 +105,8 @@ export default function ForgotPasswordPage() {
 
   const handleResend = async () => {
     if (cooldown > 0) return;
-    setError(null);
     setMessage(null);
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -117,7 +118,8 @@ export default function ForgotPasswordPage() {
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setError((json && json.error) || "Failed to resend. Try later.");
+        // Show error message if email not found or other error
+        setError(json?.error || "Failed to resend. Please try again.");
         return;
       }
 
