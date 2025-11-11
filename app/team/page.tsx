@@ -248,12 +248,12 @@ export default function TeamPage() {
                         <div className="relative">
                           <Avatar className="w-20 h-20 mx-auto mb-4 ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all">
                             <AvatarImage
-                              src={member.avatarUrl || "/placeholder.svg?height=100&width=100"}
+                              src={member.avatarUrl || undefined}
                               alt={member.name}
                             />
                             <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
                               {generateInitials(member?.name || "")}
-                            </AvatarFallback>``
+                            </AvatarFallback>
                           </Avatar>
                           <div
                             className={`absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold text-white ${getPositionColor(member.position || "")}`}
