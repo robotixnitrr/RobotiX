@@ -143,3 +143,77 @@ export async function sendResetEmail(toEmail: string, rawToken: string) {
     );
   }
 }
+
+/**
+ * Send a contact message to the club inbox using Resend, with SMTP fallback.
+ * The recipient defaults to robotixclub@nitrr.ac.in but can be overridden with CONTACT_TO env.
+ */
+export async function sendContactEmail(fromName: string, fromEmail: string, message: string) {
+  const CONTACT_TO = process.env.CONTACT_TO || "robotixclub@nitrr.ac.in";
+  const safeName = (fromName || "").trim() || "Anonymous";
+  const subject = `New contact message from ${safeName}`;
+  const text = `From: ${safeName} <${fromEmail}>\n\n${message}`;
+  const html = `
+    <div style="font-family: system-ui, Arial, sans-serif; line-height:1.6;">
+      <h2 style="margin:0 0 12px 0;">New Contact Message</h2>
+      <p><strong>From:</strong> ${safeName} &lt;${fromEmail}&gt;</p>
+      <div style="margin-top:12px; white-space:pre-wrap;">${escapeHtml(message)}</div>
+    </div>
+  `;
+
+  // Try Resend first
+  try {
+    if (!RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY is not configured");
+    }
+    const resp = await resend.emails.send({
+      from: FROM_EMAIL || "onboarding@resend.dev",
+      to: CONTACT_TO,
+      subject,
+      html,
+      text,
+      reply_to: fromEmail,
+    } as any);
+
+    if (resp && 'error' in resp) {
+      throw new Error(`Resend API error: ${JSON.stringify((resp as any).error)}`);
+    }
+    return resp;
+  } catch (err: any) {
+    const msg = err?.message || String(err);
+
+    // If SMTP creds are present, try SMTP fallback
+    if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: SMTP_PORT ? Number(SMTP_PORT) : 587,
+        secure: SMTP_PORT ? Number(SMTP_PORT) === 465 : false,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASS,
+        },
+      });
+
+      const mailResult = await transporter.sendMail({
+        from: FROM_EMAIL || SMTP_USER,
+        to: CONTACT_TO,
+        subject,
+        html,
+        text,
+        replyTo: fromEmail,
+      });
+      return mailResult;
+    }
+
+    throw new Error(`Unable to send contact email: ${msg}`);
+  }
+}
+
+function escapeHtml(str: string) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}

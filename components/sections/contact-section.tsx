@@ -16,14 +16,30 @@ export function ContactSection() {
     message: ""
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [result, setResult] = useState<{ ok?: boolean; error?: string } | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsSubmitting(false)
-    setFormData({ name: "", email: "", message: "" })
+    setResult(null)
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setResult({ error: json?.error || "Failed to send message" })
+      } else {
+        setResult({ ok: true })
+        setFormData({ name: "", email: "", message: "" })
+      }
+    } catch (err) {
+      setResult({ error: "Network error. Please try again." })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -45,8 +61,8 @@ export function ContactSection() {
     {
       icon: MapPin,
       title: "Location",
-      content: "Engineering Building, Room 301",
-      subtitle: "University Campus",
+      content: "IT Department, Room 01",
+      subtitle: "NIT Raipur Main Building",
       description: "Visit our innovation hub",
       color: "from-emerald-500 via-emerald-600 to-emerald-700",
       glowColor: "shadow-emerald-500/25"
