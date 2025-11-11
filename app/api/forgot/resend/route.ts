@@ -15,9 +15,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
+    // find user - verify email is registered
     const found = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (found.length === 0) {
-      return NextResponse.json({ ok: true });
+      return NextResponse.json({ error: "No account found with this email address" }, { status: 404 });
     }
     const user = found[0];
 

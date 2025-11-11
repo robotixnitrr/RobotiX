@@ -91,7 +91,7 @@ export default function ForgotPasswordPage() {
         startCooldown(DEFAULT_COOLDOWN);
       } else {
         setIsSent(true);
-        setMessage("If an account exists for that email, a reset link has been sent.");
+        setMessage("Reset link has been sent to your email address.");
         startCooldown(DEFAULT_COOLDOWN);
       }
     } catch (err) {
