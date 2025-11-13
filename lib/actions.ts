@@ -182,14 +182,13 @@ export async function createTask(taskData: CreateTaskInputExtended): Promise<Tas
 
 export async function updateTask(id: number, updates: Partial<Omit<CreateTaskInputExtended, "assignerId">>): Promise<Task | null> {
   try {
-    // if (updates.assignee) {
-    //   const assignee = await UserRepository.findById(Number(updates?.assignee.id))
-    //   if (!assignee) throw new Error("Assignee not found")
-    //   updates.assignee.name = assignee.name
-    //   updates.assignee.assignedAt = updates.assignee.assignedAt || new Date()
-    // }
+    // Convert dueDate string to Date object if it's a string
+    const processedUpdates = { ...updates }
+    if (processedUpdates.dueDate && typeof processedUpdates.dueDate === 'string') {
+      processedUpdates.dueDate = new Date(processedUpdates.dueDate)
+    }
 
-    const task = await TaskRepository.update(id, updates)
+    const task = await TaskRepository.update(id, processedUpdates)
 
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
