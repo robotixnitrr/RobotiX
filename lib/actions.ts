@@ -90,16 +90,40 @@ export async function getTask(id: number): Promise<Task | null> {
 }
 
 interface CreateTaskInputExtended extends CreateTaskInput {
-  assignee: Assignee;
+  assignees: Assignee[];
 }
 
 export async function createTask(taskData: CreateTaskInputExtended): Promise<Task> {
   try {
-    const assignee = await UserRepository.findById(Number(taskData.assignee.id))
-    if (!assignee) throw new Error("Assignee not found")
+    if (!taskData.assignees || taskData.assignees.length === 0) {
+      throw new Error("At least one assignee is required")
+    }
+
+    // Validate all assignees exist
+    const assigneePromises = taskData.assignees.map(assignee => 
+      UserRepository.findById(Number(assignee.id))
+    )
+    const assigneeResults = await Promise.all(assigneePromises)
+    
+    const invalidAssignees = assigneeResults.filter((assignee, index) => !assignee)
+    if (invalidAssignees.length > 0) {
+      throw new Error(`One or more assignees not found`)
+    }
 
     const assigner = await UserRepository.findById(Number(taskData.assignerId))
     if (!assigner) throw new Error("Assigner not found")
+
+    // Map assignees with their names from the database
+    const validatedAssignees = taskData.assignees.map((assignee, index) => {
+      const dbAssignee = assigneeResults[index]
+      if (!dbAssignee) throw new Error(`Assignee with id ${assignee.id} not found`)
+      
+      return {
+        id: Number(assignee.id),
+        name: dbAssignee.name,
+        assignedAt: assignee.assignedAt || new Date(),
+      }
+    })
 
     const task = await TaskRepository.create({
       title: taskData.title,
@@ -109,15 +133,7 @@ export async function createTask(taskData: CreateTaskInputExtended): Promise<Tas
       dueDate: taskData.dueDate,
       assignerId: Number(taskData.assignerId),
       assignerName: assigner.name,
-      assignees: [
-        {
-          id: Number(taskData.assignee.id),
-          name: assignee.name,
-          assignedAt: taskData.assignee.assignedAt || new Date(),
-        }
-      ]
-      // assigneeId: Number(taskData.assigneeId),
-      // assigneeName: assignee.name,
+      assignees: validatedAssignees
     })
 
     revalidatePath("/dashboard")
