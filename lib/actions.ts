@@ -8,6 +8,7 @@ import { db } from "@/db"
 import { users, tasks } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { Assignee } from "./types"
+import { sendTaskAssignmentEmail } from "@/lib/mail"
 
 // Helper: safely parse a date
 function safeParseDate(value: Date | string | null): Date {
@@ -136,6 +137,39 @@ export async function createTask(taskData: CreateTaskInputExtended): Promise<Tas
       assignees: validatedAssignees
     })
 
+    // Send email notifications to assignees based on their preferences
+    const taskUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/tasks/${task.id}`
+    
+    for (const assignee of validatedAssignees) {
+      const assigneeUser = assigneeResults.find((u, idx) => 
+        u && Number(validatedAssignees[idx].id) === Number(assignee.id)
+      )
+      
+      if (assigneeUser) {
+        const prefs = (assigneeUser as any).notificationPreferences || {
+          emailNotifications: true,
+          taskAssigned: true,
+        }
+        
+        // Check if user wants email notifications and task assignment notifications
+        if (prefs.emailNotifications && prefs.taskAssigned) {
+          // Send email asynchronously (don't await to avoid blocking)
+          sendTaskAssignmentEmail(
+            assigneeUser.email,
+            assigneeUser.name,
+            taskData.title,
+            taskData.description || "",
+            assigner.name,
+            taskData.dueDate,
+            taskData.priority,
+            taskUrl
+          ).catch(err => {
+            console.error(`Failed to send email to ${assigneeUser.email}:`, err)
+          })
+        }
+      }
+    }
+
     revalidatePath("/dashboard")
     revalidatePath("/dashboard/tasks")
 
@@ -185,10 +219,34 @@ export async function addAssigneeToTask(id: number, assignee: Assignee): Promise
       throw new Error("Assignee already exists in this task");
     }
 
-
     const updatedTask = await TaskRepository.update(id, {
       assignees: [...currentAssignees, assignee],
     });
+
+    // Send email notification to new assignee
+    const assigneeUser = await UserRepository.findById(assignee.id);
+    if (assigneeUser) {
+      const prefs = (assigneeUser as any).notificationPreferences || {
+        emailNotifications: true,
+        taskAssigned: true,
+      };
+      
+      if (prefs.emailNotifications && prefs.taskAssigned) {
+        const taskUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/tasks/${id}`;
+        sendTaskAssignmentEmail(
+          assigneeUser.email,
+          assigneeUser.name,
+          task.title,
+          task.description || "",
+          assigner.name,
+          task.dueDate || new Date(),
+          task.priority || "medium",
+          taskUrl
+        ).catch(err => {
+          console.error(`Failed to send email to ${assigneeUser.email}:`, err);
+        });
+      }
+    }
 
     // Invalidate pages
     revalidatePath("/dashboard");
@@ -200,6 +258,90 @@ export async function addAssigneeToTask(id: number, assignee: Assignee): Promise
     console.error("Error in addAssigneeToTask:", error);
     throw new Error(
       `Failed to add assignee to task: ${error instanceof Error ? error.message : "Unknown error"}`
+    );
+  }
+}
+
+export async function reassignTask(id: number, newAssignees: Assignee[]): Promise<Task | null> {
+  try {
+    if (!newAssignees || newAssignees.length === 0) {
+      throw new Error("At least one assignee is required");
+    }
+
+    const task = await TaskRepository.findById(id);
+    if (!task) throw new Error("Task not found");
+
+    const assigner = await UserRepository.findById(Number(task.assignerId));
+    if (!assigner) throw new Error("Assigner not found");
+
+    // Validate all new assignees exist
+    const assigneePromises = newAssignees.map(assignee => 
+      UserRepository.findById(Number(assignee.id))
+    );
+    const assigneeResults = await Promise.all(assigneePromises);
+    
+    const invalidAssignees = assigneeResults.filter((assignee) => !assignee);
+    if (invalidAssignees.length > 0) {
+      throw new Error(`One or more assignees not found`);
+    }
+
+    // Map assignees with their names from the database
+    const validatedAssignees = newAssignees.map((assignee, index) => {
+      const dbAssignee = assigneeResults[index];
+      if (!dbAssignee) throw new Error(`Assignee with id ${assignee.id} not found`);
+      
+      return {
+        id: Number(assignee.id),
+        name: dbAssignee.name,
+        assignedAt: assignee.assignedAt || new Date(),
+      };
+    });
+
+    const updatedTask = await TaskRepository.update(id, {
+      assignees: validatedAssignees,
+    });
+
+    // Send email notifications to new assignees based on their preferences
+    const taskUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/tasks/${id}`;
+    
+    for (const assignee of validatedAssignees) {
+      const assigneeUser = assigneeResults.find((u, idx) => 
+        u && Number(validatedAssignees[idx].id) === Number(assignee.id)
+      );
+      
+      if (assigneeUser) {
+        const prefs = (assigneeUser as any).notificationPreferences || {
+          emailNotifications: true,
+          taskAssigned: true,
+        };
+        
+        if (prefs.emailNotifications && prefs.taskAssigned) {
+          sendTaskAssignmentEmail(
+            assigneeUser.email,
+            assigneeUser.name,
+            task.title,
+            task.description || "",
+            assigner.name,
+            task.dueDate || new Date(),
+            task.priority || "medium",
+            taskUrl
+          ).catch(err => {
+            console.error(`Failed to send email to ${assigneeUser.email}:`, err);
+          });
+        }
+      }
+    }
+
+    // Invalidate pages
+    revalidatePath("/dashboard");
+    revalidatePath("/dashboard/tasks");
+    revalidatePath(`/dashboard/tasks/${id}`);
+
+    return updatedTask;
+  } catch (error) {
+    console.error("Error in reassignTask:", error);
+    throw new Error(
+      `Failed to reassign task: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }
