@@ -16,6 +16,12 @@ export const users = pgTable(
     githubUrl: text("github_url"),
     linkedinUrl: text("linkedin_url"),
     lastNotificationReadAt: timestamp("last_notification_read_at", { withTimezone: true }).defaultNow(),
+    notificationPreferences: jsonb("notification_preferences").default({
+      emailNotifications: true,
+      taskAssigned: true,
+      taskUpdated: true,
+      taskCompleted: true,
+    }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
