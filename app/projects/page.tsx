@@ -405,7 +405,7 @@ export default function ProjectsPage() {
                     <>
                       {/* Registration temporarily closed - link commented out */}
                       <Button disabled size="lg" className="opacity-70">
-                        Join RobotiX Club
+                        Join ROBOTiX Club
                         <Users className="ml-2 h-5 w-5" />
                       </Button>
                       <Link href="/#contact">

@@ -143,7 +143,7 @@ export default function ForgotPasswordPage() {
       <Link href="/" className="absolute left-4 top-4 md:left-8 md:top-8">
         <div className="flex items-center gap-2">
           <CheckCircle className="h-6 w-6 text-primary" />
-          <span className="text-lg font-bold">RobotiX TaskFlow</span>
+          <span className="text-lg font-bold">ROBOTiX TaskFlow</span>
         </div>
       </Link>
 

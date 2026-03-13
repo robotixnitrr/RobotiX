@@ -72,7 +72,7 @@ export const APP_CONFIG = {
   name: "ROBOTiX",
   description: "ROBOTiX Club",
   version: "1.0.0",
-  author: "RobotiX Club",
+  author: "ROBOTiX Club",
 } as const
 
 export const SOCIAL_LINKS = {

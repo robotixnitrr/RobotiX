@@ -1,3 +1,13 @@
+import { redirect } from "next/navigation"
+
+// Temporarily redirect to Robofest landing page during the event
+// Remove this redirect after Robofest 2026 is complete
+export default function HomePage() {
+  redirect("/robofest")
+}
+
+// Original homepage code - uncomment after Robofest:
+/*
 import { Navigation } from "@/components/layout/navigation"
 import { HeroSection } from "@/components/sections/hero-section"
 import { AboutSection } from "@/components/sections/about-section"
@@ -25,3 +35,4 @@ export default function HomePage() {
     </div>
   )
 }
+*/

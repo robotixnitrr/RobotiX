@@ -143,7 +143,7 @@ export default function TeamPage() {
                 of {members.length}
               </h3>
               <p className="text-xl text-muted-foreground max-w-3xl">
-                Meet the passionate individuals who drive innovation and excellence at RobotiX Club. Our diverse team
+                Meet the passionate individuals who drive innovation and excellence at ROBOTiX Club. Our diverse team
                 brings together expertise in robotics, AI, IoT, and cutting-edge technology.
               </p>
             </div>
@@ -323,7 +323,7 @@ export default function TeamPage() {
                     <>
                       {/* Registration temporarily closed - link commented out */}
                       <Button disabled size="lg" className="opacity-70">
-                        Join RobotiX Club
+                        Join ROBOTiX Club
                         <Users className="ml-2 h-5 w-5" />
                       </Button>
                       <Link href="/#contact">
