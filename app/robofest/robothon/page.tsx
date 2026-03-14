@@ -606,7 +606,7 @@ export default function RobothonPage() {
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <motion.a
-                href="https://unstop.com/o/Gw4fTex?lb=bqoA1gBv&utm_medium=Share&utm_source=online_coding_challenge&utm_campaign=Anantyac28082"
+                href="https://unstop.com/hackathons/robothon-26-robofest-26-national-institute-of-technology-nit-raipur-1654645?lb=hIF1eH2&utm_medium=Share&utm_source=online_coding_challenge&utm_campaign=Robotixclubz3574"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
