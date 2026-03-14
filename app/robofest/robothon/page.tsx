@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils"
 
 // Navigation items
 const navItems = [
-  { name: "Back to ANANTYA'26", href: "/robofest", icon: ArrowLeft },
+  { name: "Back to Robofest", href: "/robofest", icon: ArrowLeft },
   { name: "About", href: "#about" },
   { name: "Evaluation", href: "#evaluation" },
   { name: "Problem Statements", href: "#problems" },
@@ -1032,7 +1032,7 @@ export default function RobothonPage() {
               className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm flex items-center gap-1"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to ANANTYA'26
+              Back to Robofest
             </Link>
           </div>
         </div>
