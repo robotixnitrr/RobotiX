@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils"
 
 // Navigation items
 const navItems = [
-  { name: "Back to ANANTYA'26", href: "/robofest", icon: ArrowLeft },
+  { name: "Back to Robofest", href: "/robofest", icon: ArrowLeft },
   { name: "About", href: "#about" },
   { name: "Evaluation", href: "#evaluation" },
   { name: "Problem Statements", href: "#problems" },
@@ -606,7 +606,7 @@ export default function RobothonPage() {
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
               <motion.a
-                href="https://unstop.com/o/Gw4fTex?lb=bqoA1gBv&utm_medium=Share&utm_source=online_coding_challenge&utm_campaign=Anantyac28082"
+                href="https://unstop.com/hackathons/robothon-26-robofest-26-national-institute-of-technology-nit-raipur-1654645?lb=hIF1eH2&utm_medium=Share&utm_source=online_coding_challenge&utm_campaign=Robotixclubz3574"
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
@@ -1032,7 +1032,7 @@ export default function RobothonPage() {
               className="text-cyan-400 hover:text-cyan-300 transition-colors text-sm flex items-center gap-1"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back to ANANTYA'26
+              Back to Robofest
             </Link>
           </div>
         </div>

@@ -925,7 +925,7 @@ export default function RobofestPage() {
                     backgroundClip: "text",
                   }}
                 >
-                  ANANTYA&apos;26
+                  ROBOFEST&apos;26
                 </h1>
                 {/* Light bloom effect */}
                 <div className="absolute -top-4 left-0 w-full h-32 bg-cyan-400/10 blur-3xl -z-10"></div>
@@ -941,14 +941,14 @@ export default function RobofestPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-px bg-gradient-to-r from-transparent to-cyan-400"></div>
                   <h2
-                    className="text-2xl sm:text-3xl lg:text-4xl font-bold text-cyan-400"
+                    className="text-1.5xl sm:text-2xl lg:text-3xl font-bold text-cyan-400"
                     style={{
                       fontFamily: "var(--font-orbitron), sans-serif",
                       textShadow:
                         "0 0 30px rgba(0, 212, 255, 0.8), 0 0 60px rgba(0, 212, 255, 0.4)",
                     }}
                   >
-                    ENTER THE TECHSIDE
+                    ANANTYA'26: Tech Fest NIT Raipur
                   </h2>
                   <div className="w-8 h-px bg-gradient-to-l from-transparent to-cyan-400"></div>
                 </div>
