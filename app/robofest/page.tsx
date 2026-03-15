@@ -40,7 +40,7 @@ const mainEvent = {
     { icon: Clock, label: "Duration:", value: "24 Hours", iconColor: "text-cyan-400" },
     { icon: Users, label: "Team Size:", value: "2-4 Members", iconColor: "text-cyan-400" },
     { icon: Zap, label: "Format:", value: "Simulation-Based", iconColor: "text-yellow-500" },
-    { icon: Trophy, label: "Prize Pool:", value: "₹35,000", iconColor: "text-cyan-400" },
+    { icon: Trophy, label: "Prize Pool:", value: "₹35,000", iconColor: "text-yellow-500" },
   ],
   rules: ["Problem Statement", "Judging Criteria", "Submission Format", "Resource Kit"],
   registerLink: "/robofest/robothon",
@@ -61,10 +61,10 @@ const minorEvents = [
       { icon: Cpu, label: "Platform:", value: "Arduino/ESP/Verilog", iconColor: "text-cyan-400" },
       { icon: Users, label: "Team Size:", value: "1-2 Members", iconColor: "text-cyan-400" },
       { icon: Clock, label: "Duration:", value: "2-3 Hours", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹5,000", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹12,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Hardware Provided", "Sensor Integration", "Code Optimization", "Real-time Testing"],
-    registerLink: "https://forms.google.com/vibecoding-registration",
+    registerLink: "https://unstop.com/hackathons/vibe-coding-robofest-26-national-institute-of-technology-nit-raipur-1659364",
     rulebookLink: "#rulebook",
   },
   {
@@ -78,10 +78,27 @@ const minorEvents = [
       { icon: Settings, label: "Weight Limit:", value: "8  kg", iconColor: "text-cyan-400" },
       { icon: Zap, label: "Connection:", value: "Wireless Only", iconColor: "text-yellow-500" },
       { icon: Users, label: "Team Size:", value: "1-4  Members", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Arena Size", "Safety Rules", "Elimination Format", "Judging Criteria"],
     registerLink: "https://unstop.com/competitions/robowars-robofest-26-robofest-26-national-institute-of-technology-nit-raipur-1656702",
+    rulebookLink: "#rulebook",
+  },
+  {
+    id: "roboquiz",
+    badge: "QUIZ EVENT",
+    title: "ROBOQUIZ",
+    subtitle: "TEST YOUR KNOWLEDGE",
+    description: "Robotics-themed quiz competition designed to test participants’ knowledge of robotics, electronics, and emerging technologies through engaging and competitive rounds.",
+    dateTime: "22 March • 2:30 PM Onwards",
+    specs: [
+      { icon: Lightbulb, label: "Rounds:", value: "2", iconColor: "text-yellow-500" },
+      { icon: Settings, label: "Mode:", value: "Offline", iconColor: "text-cyan-400" },
+      { icon: Users, label: "Team Size:", value: " Individual Participation", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "1st Prize:", value: "Goodies worth ₹6,000", iconColor: "text-yellow-500" },
+    ],
+    rules: ["Arena Size", "Safety Rules", "Elimination Format", "Judging Criteria"],
+    registerLink: "https://unstop.com/o/IwoBX5F?utm_medium=Share&utm_source=robotixclubz3574&utm_campaign=Quizzes",
     rulebookLink: "#rulebook",
   },
   // Day 2 - 23 March
@@ -96,29 +113,13 @@ const minorEvents = [
       { icon: Users, label: "Team Size:", value: "1-4 Members", iconColor: "text-cyan-400" },
       { icon: Settings, label: "Max Size:", value: "25x25x25 cm", iconColor: "text-cyan-400" },
       { icon: Settings, label: "Weight Limit:", value: "5 kg", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Track Layout", "Bot Dimensions", "Timing Rules", "Restart Policy"],
     registerLink: "https://unstop.com/competitions/roborace-robofest26-robofest-26-national-institute-of-technology-nit-raipur-1655808?lb=hIF1eH2&utm_medium=Share&utm_source=robotixclubz3574&utm_campaign=Competitions",
     rulebookLink: "#rulebook",
   },
-  {
-    id: "techconnect",
-    badge: "SPEAKER SESSION",
-    title: "TECH CONNECT",
-    subtitle: "LEARN FROM THE BEST",
-    description: "An inspiring speaker session featuring industry experts and tech leaders sharing insights on robotics, AI, and the future of technology.",
-    dateTime: "23 March • 11 AM - 1 PM",
-    specs: [
-      { icon: Mic, label: "Format:", value: "Speaker Session", iconColor: "text-yellow-500" },
-      { icon: Users, label: "Audience:", value: "Open to All", iconColor: "text-cyan-400" },
-      { icon: Clock, label: "Duration:", value: "2 Hours", iconColor: "text-cyan-400" },
-      { icon: Lightbulb, label: "Topics:", value: "Tech & Innovation", iconColor: "text-cyan-400" },
-    ],
-    rules: ["Q&A Session", "Networking", "Industry Insights", "Career Guidance"],
-    registerLink: "https://forms.google.com/techconnect-registration",
-    rulebookLink: "#rulebook",
-  },
+
   {
     id: "ideathon",
     badge: "INNOVATION EVENT",
@@ -130,7 +131,7 @@ const minorEvents = [
       { icon: Lightbulb, label: "Format:", value: "Pitch & Demo", iconColor: "text-yellow-500" },
       { icon: Users, label: "Team Size:", value: "2-4 Members", iconColor: "text-cyan-400" },
       { icon: Clock, label: "Pitch Time:", value: "10 Minutes", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹15,000", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹15,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Presentation Format", "Evaluation Criteria", "Prototype Requirements", "Q&A Session"],
     registerLink: "https://unstop.com/o/I5jC4aD?lb=koLWlSN&utm_medium=Share&utm_source=competitions&utm_campaign=Innovrai2351",
@@ -147,7 +148,7 @@ const minorEvents = [
       { icon: Settings, label: "Max Size:", value: "30 x 30 x 30 cm", iconColor: "text-cyan-400" },
       { icon: Settings, label: "Weight Limit:", value: "5 kg", iconColor: "text-cyan-400" },
       { icon: Clock, label: "Match Time:", value: "2.5 Minutes", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-cyan-400" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹10,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Field Dimensions", "Bot Specifications", "Scoring System", "Fouls & Penalties"],
     registerLink: "https://unstop.com/competitions/robosoccer-robofest-26-national-institute-of-technology-nit-raipur-1656104",
@@ -890,7 +891,7 @@ export default function RobofestPage() {
                 <div className="flex items-center gap-2">
                   <div className="text-cyan-400 text-xl opacity-50">[</div>
                   <div
-                    className="flex items-center gap-2 text-cyan-400 text-sm uppercase tracking-[0.3em] font-medium"
+                    className="flex items-center gap-2 text-cyan-400 text-sm tracking-[0.3em] font-medium"
                     style={{ fontFamily: "var(--font-exo), sans-serif" }}
                   >
                     <motion.div
