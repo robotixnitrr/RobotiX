@@ -64,7 +64,7 @@ const minorEvents = [
       { icon: Trophy, label: "Prize Pool:", value: "₹12,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Hardware Provided", "Sensor Integration", "Code Optimization", "Real-time Testing"],
-    registerLink: "https://unstop.com/hackathons/vibe-coding-robofest-26-national-institute-of-technology-nit-raipur-1659364",
+    registerLink: "https://unstop.com/o/mAyxjwR?utm_medium=Share&utm_source=robotixclubz3574&utm_campaign=Online_coding_challenge",
     rulebookLink: "#rulebook",
   },
   {
