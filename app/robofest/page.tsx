@@ -61,7 +61,7 @@ const minorEvents = [
       { icon: Cpu, label: "Platform:", value: "Arduino/ESP/Verilog", iconColor: "text-cyan-400" },
       { icon: Users, label: "Team Size:", value: "1-2 Members", iconColor: "text-cyan-400" },
       { icon: Clock, label: "Duration:", value: "2-3 Hours", iconColor: "text-cyan-400" },
-      { icon: Trophy, label: "Prize Pool:", value: "₹5,000", iconColor: "text-yellow-500" },
+      { icon: Trophy, label: "Prize Pool:", value: "₹12,000", iconColor: "text-yellow-500" },
     ],
     rules: ["Hardware Provided", "Sensor Integration", "Code Optimization", "Real-time Testing"],
     registerLink: "https://unstop.com/hackathons/vibe-coding-robofest-26-national-institute-of-technology-nit-raipur-1659364",
