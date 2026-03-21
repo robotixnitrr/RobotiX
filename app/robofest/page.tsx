@@ -1203,7 +1203,7 @@ export default function RobofestPage() {
           </motion.div>
 
           {/* Title Sponsor - largest, full width */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -1220,132 +1220,11 @@ export default function RobofestPage() {
             >
               ★ Title Sponsor ★
             </span>
-          </motion.div>
+          </motion.div> */}
 
           {/* Title Sponsor — full width prominent card */}
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-            whileHover={{ y: -6, transition: { duration: 0.3 } }}
-            className="relative rounded-xl group mb-6 max-w-3xl mx-auto w-full"
-          >
-            {/* Gold glow */}
-            <div
-              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{ boxShadow: "0 0 60px rgba(234, 179, 8, 0.35)" }}
-            />
-            <div
-              className="relative rounded-xl px-16 py-12 border-2 border-yellow-400/60 flex flex-col items-center gap-6"
-              style={{
-                background: "linear-gradient(135deg, rgba(20, 25, 50, 0.98), rgba(35, 28, 5, 0.97))",
-                backdropFilter: "blur(12px)",
-                boxShadow: "0 0 50px rgba(234, 179, 8, 0.12), inset 0 0 60px rgba(234, 179, 8, 0.05)",
-              }}
-            >
-              {/* Corner accents - gold, larger */}
-              <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-yellow-400" />
-              <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-yellow-400" />
-              <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-yellow-400" />
-              <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-yellow-400" />
-              {/* Subtle gold shimmer line */}
-              <div
-                className="absolute top-0 left-1/4 right-1/4 h-px"
-                style={{ background: "linear-gradient(to right, transparent, rgba(234,179,8,0.6), transparent)" }}
-              />
+          
 
-              <div className="w-full flex items-center justify-center min-h-[160px]">
-                <Image
-                  src="/sponsors/title_sponsor.png"
-                  alt="Title Sponsor"
-                  width={380}
-                  height={160}
-                  className="object-contain max-h-[160px] w-auto"
-                  style={{ filter: "brightness(1.15)" }}
-                />
-              </div>
-              <div className="text-center">
-                <p
-                  className="text-yellow-400 text-base font-bold uppercase tracking-[0.3em]"
-                  style={{ fontFamily: "var(--font-exo), sans-serif", textShadow: "0 0 12px rgba(234,179,8,0.5)" }}
-                >
-                  Title Sponsor
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Voice of the Event label */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-center mb-8 mt-10"
-          >
-            <span
-              className="px-4 py-1 text-xs font-bold uppercase tracking-[0.3em] rounded-full border border-yellow-400/40 text-yellow-300/80"
-              style={{
-                background: "rgba(234, 179, 8, 0.07)",
-                boxShadow: "0 0 14px rgba(234, 179, 8, 0.12)",
-                fontFamily: "var(--font-exo), sans-serif",
-              }}
-            >
-              Voice of the Event
-            </span>
-          </motion.div>
-
-          {/* Voice of the Event — smaller centered card */}
-          <div className="flex justify-center mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
-            whileHover={{ y: -6, transition: { duration: 0.3 } }}
-            className="relative rounded-xl group w-full max-w-sm"
-          >
-            {/* Gold glow */}
-            <div
-              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{ boxShadow: "0 0 40px rgba(234, 179, 8, 0.25)" }}
-            />
-            <div
-              className="relative rounded-xl p-8 border border-yellow-400/40 flex flex-col items-center gap-6"
-              style={{
-                background: "linear-gradient(135deg, rgba(15, 20, 40, 0.98), rgba(25, 20, 5, 0.95))",
-                backdropFilter: "blur(10px)",
-                boxShadow: "0 0 30px rgba(234, 179, 8, 0.08), inset 0 0 40px rgba(234, 179, 8, 0.03)",
-              }}
-            >
-              {/* Corner accents - gold */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-yellow-400" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-yellow-400" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-yellow-400" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-yellow-400" />
-
-                <div className="w-full flex items-center justify-center min-h-[160px]">
-                  <Image
-                    src="/sponsors/voice_of_the_event.png"
-                    alt="Voice of the Event"
-                    width={380}
-                    height={160}
-                    className="object-contain max-h-[160px] w-auto"
-                    style={{ filter: "brightness(1.1)" }}
-                  />
-                </div>
-                <div className="text-center">
-                  <p
-                    className="text-yellow-400 text-sm font-bold uppercase tracking-widest"
-                    style={{ fontFamily: "var(--font-exo), sans-serif" }}
-                  >
-                    Voice of the Event
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          </div>
 
           {/* Divider */}
           <div className="flex items-center gap-4 mb-14 max-w-4xl mx-auto">
@@ -1362,29 +1241,14 @@ export default function RobofestPage() {
           {/* Other Sponsors Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
-              { src: "/sponsors/associate_sponsor.png", name: "Associate Sponsor" },
-              { src: "/sponsors/awards_partner.png", name: "Awards Partner" },
-              { src: "/sponsors/coverage-partner.png", name: "Coverage Partner" },
+              { src: "/sponsors/platform_partner.png", name: "Platform Partner" }, 
               { src: "/sponsors/coverage_partner_1.png", name: "Coverage Partner" },
-              { src: "/sponsors/coverage_partner_2.png", name: "Coverage Partner" },
-              { src: "/sponsors/design_partner.png", name: "Design Partner" },
+              { src: "/sponsors/voice_of_the_event.png", name: "Voice of the event" },
+              { src: "/sponsors/coverage_partner_2.png", name: "Coverage Partner" },  
               { src: "/sponsors/electronics_partner (2).png", name: "Electronics Partner" },
-              { src: "/sponsors/electronics_partner.png", name: "Electronics Partner" },
-              { src: "/sponsors/gifting_partner.png", name: "Gifting Partner" },
               { src: "/sponsors/gifting_partner_2.png", name: "Gifting Partner" },
-              { src: "/sponsors/hospitality_partner.png", name: "Hospitality Partner" },
-              { src: "/sponsors/hospitality_partner_2.png", name: "Hospitality Partner" },
-              { src: "/sponsors/media_partner.png", name: "Media Partner" },
-              { src: "/sponsors/music_partner.png", name: "Music Partner" },
-              { src: "/sponsors/music_partner_2.png", name: "Music Partner" },
-              { src: "/sponsors/platform_partner.png", name: "Platform Partner" },
-              { src: "/sponsors/shipping_partner.png", name: "Shipping Partner" },
-              { src: "/sponsors/stationary_partner.png", name: "Stationary Partner" },
-              { src: "/sponsors/style_and_lifestyle_partner.png", name: "Style & Lifestyle Partner" },
-              { src: "/sponsors/style_and_lifestyle_partner_2.png", name: "Style & Lifestyle Partner" },
-              { src: "/sponsors/style_and_lifestyle_partner_3.png", name: "Style & Lifestyle Partner" },
-              { src: "/sponsors/travel_partner.png", name: "Travel Partner" },
               { src: "/sponsors/trophy_partner.png", name: "Trophy Partner" },
+              { src: "/sponsors/media_partner.png", name: "Media Partner" }, 
             ].map((sponsor, index) => (
               <motion.div
                 key={sponsor.src}
