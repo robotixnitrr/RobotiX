@@ -1241,14 +1241,14 @@ export default function RobofestPage() {
           {/* Other Sponsors Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
+              { src: "/sponsors/platform_partner.png", name: "Platform Partner" }, 
               { src: "/sponsors/coverage_partner_1.png", name: "Coverage Partner" },
               { src: "/sponsors/voice_of_the_event.png", name: "Voice of the event" },
               { src: "/sponsors/coverage_partner_2.png", name: "Coverage Partner" },  
               { src: "/sponsors/electronics_partner (2).png", name: "Electronics Partner" },
               { src: "/sponsors/gifting_partner_2.png", name: "Gifting Partner" },
               { src: "/sponsors/trophy_partner.png", name: "Trophy Partner" },
-              { src: "/sponsors/media_partner.png", name: "Media Partner" },
-              { src: "/sponsors/platform_partner.png", name: "Platform Partner" },  
+              { src: "/sponsors/media_partner.png", name: "Media Partner" }, 
             ].map((sponsor, index) => (
               <motion.div
                 key={sponsor.src}
