@@ -1136,6 +1136,302 @@ export default function RobofestPage() {
         </div>
       </section>
 
+      {/* Sponsors Section */}
+      <section id="sponsors" className="relative bg-[#070b17] py-20">
+        {/* Background glow */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 blur-[120px] rounded-full" />
+          <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-500/5 blur-[100px] rounded-full" />
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center mb-16"
+          >
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-cyan-500 text-sm uppercase tracking-[0.3em] mb-4"
+              style={{ fontFamily: "var(--font-exo), sans-serif" }}
+            >
+              ROBOFEST&apos;26
+            </motion.p>
+            <motion.h2
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+              className="text-5xl md:text-6xl font-black mb-4"
+              style={{
+                fontFamily: "var(--font-orbitron), sans-serif",
+                background: "linear-gradient(to bottom, #ffffff, #00d4ff, #0099cc)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              OUR SPONSORS
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="text-gray-400 max-w-2xl mx-auto px-4"
+            >
+              Fueling innovation — meet the visionaries who power ROBOFEST&apos;26
+            </motion.p>
+            {/* Decorative line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mt-6 mx-auto w-40 h-px"
+              style={{
+                background: "linear-gradient(to right, transparent, #00d4ff, transparent)",
+                boxShadow: "0 0 10px rgba(0, 212, 255, 0.6)",
+              }}
+            />
+          </motion.div>
+
+          {/* Title Sponsor - largest, full width */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-8"
+          >
+            <span
+              className="px-4 py-1 text-xs font-bold uppercase tracking-[0.3em] rounded-full border border-yellow-400/60 text-yellow-400"
+              style={{
+                background: "rgba(234, 179, 8, 0.1)",
+                boxShadow: "0 0 20px rgba(234, 179, 8, 0.2)",
+                fontFamily: "var(--font-exo), sans-serif",
+              }}
+            >
+              ★ Title Sponsor ★
+            </span>
+          </motion.div>
+
+          {/* Title Sponsor — full width prominent card */}
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileHover={{ y: -6, transition: { duration: 0.3 } }}
+            className="relative rounded-xl group mb-6 max-w-3xl mx-auto w-full"
+          >
+            {/* Gold glow */}
+            <div
+              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{ boxShadow: "0 0 60px rgba(234, 179, 8, 0.35)" }}
+            />
+            <div
+              className="relative rounded-xl px-16 py-12 border-2 border-yellow-400/60 flex flex-col items-center gap-6"
+              style={{
+                background: "linear-gradient(135deg, rgba(20, 25, 50, 0.98), rgba(35, 28, 5, 0.97))",
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 0 50px rgba(234, 179, 8, 0.12), inset 0 0 60px rgba(234, 179, 8, 0.05)",
+              }}
+            >
+              {/* Corner accents - gold, larger */}
+              <div className="absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 border-yellow-400" />
+              <div className="absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 border-yellow-400" />
+              <div className="absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 border-yellow-400" />
+              <div className="absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 border-yellow-400" />
+              {/* Subtle gold shimmer line */}
+              <div
+                className="absolute top-0 left-1/4 right-1/4 h-px"
+                style={{ background: "linear-gradient(to right, transparent, rgba(234,179,8,0.6), transparent)" }}
+              />
+
+              <div className="w-full flex items-center justify-center min-h-[160px]">
+                <Image
+                  src="/sponsors/title_sponsor.png"
+                  alt="Title Sponsor"
+                  width={380}
+                  height={160}
+                  className="object-contain max-h-[160px] w-auto"
+                  style={{ filter: "brightness(1.15)" }}
+                />
+              </div>
+              <div className="text-center">
+                <p
+                  className="text-yellow-400 text-base font-bold uppercase tracking-[0.3em]"
+                  style={{ fontFamily: "var(--font-exo), sans-serif", textShadow: "0 0 12px rgba(234,179,8,0.5)" }}
+                >
+                  Title Sponsor
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Voice of the Event label */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-center mb-8 mt-10"
+          >
+            <span
+              className="px-4 py-1 text-xs font-bold uppercase tracking-[0.3em] rounded-full border border-yellow-400/40 text-yellow-300/80"
+              style={{
+                background: "rgba(234, 179, 8, 0.07)",
+                boxShadow: "0 0 14px rgba(234, 179, 8, 0.12)",
+                fontFamily: "var(--font-exo), sans-serif",
+              }}
+            >
+              Voice of the Event
+            </span>
+          </motion.div>
+
+          {/* Voice of the Event — smaller centered card */}
+          <div className="flex justify-center mb-20">
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            whileHover={{ y: -6, transition: { duration: 0.3 } }}
+            className="relative rounded-xl group w-full max-w-sm"
+          >
+            {/* Gold glow */}
+            <div
+              className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+              style={{ boxShadow: "0 0 40px rgba(234, 179, 8, 0.25)" }}
+            />
+            <div
+              className="relative rounded-xl p-8 border border-yellow-400/40 flex flex-col items-center gap-6"
+              style={{
+                background: "linear-gradient(135deg, rgba(15, 20, 40, 0.98), rgba(25, 20, 5, 0.95))",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 0 30px rgba(234, 179, 8, 0.08), inset 0 0 40px rgba(234, 179, 8, 0.03)",
+              }}
+            >
+              {/* Corner accents - gold */}
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-yellow-400" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-yellow-400" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-yellow-400" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-yellow-400" />
+
+                <div className="w-full flex items-center justify-center min-h-[160px]">
+                  <Image
+                    src="/sponsors/voice_of_the_event.png"
+                    alt="Voice of the Event"
+                    width={380}
+                    height={160}
+                    className="object-contain max-h-[160px] w-auto"
+                    style={{ filter: "brightness(1.1)" }}
+                  />
+                </div>
+                <div className="text-center">
+                  <p
+                    className="text-yellow-400 text-sm font-bold uppercase tracking-widest"
+                    style={{ fontFamily: "var(--font-exo), sans-serif" }}
+                  >
+                    Voice of the Event
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4 mb-14 max-w-4xl mx-auto">
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(0,212,255,0.3))" }} />
+            <span
+              className="text-cyan-500/70 text-xs uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-exo), sans-serif" }}
+            >
+              Partners &amp; Sponsors
+            </span>
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(0,212,255,0.3))" }} />
+          </div>
+
+          {/* Other Sponsors Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { src: "/sponsors/associate_sponsor.png", name: "Associate Sponsor" },
+              { src: "/sponsors/awards_partner.png", name: "Awards Partner" },
+              { src: "/sponsors/coverage-partner.png", name: "Coverage Partner" },
+              { src: "/sponsors/coverage_partner_1.png", name: "Coverage Partner" },
+              { src: "/sponsors/coverage_partner_2.png", name: "Coverage Partner" },
+              { src: "/sponsors/design_partner.png", name: "Design Partner" },
+              { src: "/sponsors/electronics_partner (2).png", name: "Electronics Partner" },
+              { src: "/sponsors/electronics_partner.png", name: "Electronics Partner" },
+              { src: "/sponsors/gifting_partner.png", name: "Gifting Partner" },
+              { src: "/sponsors/gifting_partner_2.png", name: "Gifting Partner" },
+              { src: "/sponsors/hospitality_partner.png", name: "Hospitality Partner" },
+              { src: "/sponsors/hospitality_partner_2.png", name: "Hospitality Partner" },
+              { src: "/sponsors/media_partner.png", name: "Media Partner" },
+              { src: "/sponsors/music_partner.png", name: "Music Partner" },
+              { src: "/sponsors/music_partner_2.png", name: "Music Partner" },
+              { src: "/sponsors/platform_partner.png", name: "Platform Partner" },
+              { src: "/sponsors/shipping_partner.png", name: "Shipping Partner" },
+              { src: "/sponsors/stationary_partner.png", name: "Stationary Partner" },
+              { src: "/sponsors/style_and_lifestyle_partner.png", name: "Style & Lifestyle Partner" },
+              { src: "/sponsors/style_and_lifestyle_partner_2.png", name: "Style & Lifestyle Partner" },
+              { src: "/sponsors/style_and_lifestyle_partner_3.png", name: "Style & Lifestyle Partner" },
+              { src: "/sponsors/travel_partner.png", name: "Travel Partner" },
+              { src: "/sponsors/trophy_partner.png", name: "Trophy Partner" },
+            ].map((sponsor, index) => (
+              <motion.div
+                key={sponsor.src}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{
+                  duration: 0.5,
+                  delay: (index % 4) * 0.08,
+                  ease: [0.25, 0.46, 0.45, 0.94],
+                }}
+                whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                className="relative rounded-lg group"
+              >
+                <div
+                  className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-400"
+                  style={{ boxShadow: "0 0 20px rgba(0,212,255,0.15)" }}
+                />
+                <div
+                  className="relative rounded-lg p-5 border border-cyan-500/20 group-hover:border-cyan-500/40 transition-colors duration-300 flex flex-col items-center gap-4"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(10, 15, 30, 0.98), rgba(5, 10, 20, 0.98))",
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <div className="w-full flex items-center justify-center min-h-[120px]">
+                    <Image
+                      src={sponsor.src}
+                      alt={sponsor.name}
+                      width={240}
+                      height={120}
+                      className="object-contain max-h-[120px] w-auto"
+                      style={{ filter: "brightness(1.1)" }}
+                    />
+                  </div>
+                  <p
+                    className="text-gray-400 text-sm font-medium uppercase tracking-wider text-center group-hover:text-cyan-400 transition-colors duration-300"
+                    style={{ fontFamily: "var(--font-exo), sans-serif" }}
+                  >
+                    {sponsor.name}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
     </div>
   )
