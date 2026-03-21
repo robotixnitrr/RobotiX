@@ -83,6 +83,8 @@
     "nodemailer": "^7.0.6",
     "pg": "latest",
     "postgres": "latest",
+    "@op-engineering/op-sqlite": "latest",
+    "expo-sqlite": "latest",
     "react": "^18.2.0",
     "react-day-picker": "8.10.1",
     "react-dom": "^18.2.0",
